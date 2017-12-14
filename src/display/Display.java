@@ -1,4 +1,6 @@
 package display;
+import IO.Input;
+
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
@@ -84,4 +86,7 @@ public class Display {
         g.fillOval(400-50,300-50,100,100);
     }
 */
+    public static void addInputListener(Input inputListener){
+        window.add(inputListener);
+    }
 }

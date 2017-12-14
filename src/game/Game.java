@@ -3,6 +3,8 @@ package game;
 import display.Display;
 import utils.Time;
 
+import java.awt.*;
+
 public class Game implements Runnable{
     public static final int WIDTH = 800;
     public static final int HEIGHT = 600;
@@ -17,10 +19,19 @@ public class Game implements Runnable{
 
     private boolean running; //флаг запущена ли игра
     private Thread gameThread;
+    private Graphics2D graphics;
+
+    // temp
+    float x = 350;
+    float y = 250;
+    float delta = 0;
+    float radius = 50;
+    //temp end
 
     public Game(){
         running=false;
         Display.created(WIDTH,HEIGHT,TITLE,CLEAR_COLOR,NUM_BUFFERS);
+        graphics = Display.getGraphics();
 
     }
 
@@ -50,10 +61,15 @@ public class Game implements Runnable{
     }
     private void update(){
         //физика игры
+        delta+=0.02f;
     }
 
     private void render(){
         //прорисовка сцен вахаха, пульки пульки
+        Display.clear();
+        graphics.setColor(Color.white);
+        graphics.fillOval((int)(x+(Math.sin(delta)*200)),(int)y,(int)radius*2,(int)radius*2);
+        Display.swapBuffers();
     }
 
     @Override
@@ -82,6 +98,7 @@ public class Game implements Runnable{
             delta += (elapsedTime/UPDATE_INTERVAL); //каждая 1 означает что нужно сделать update
             while (delta>1){
                 update();
+                upd++;
                 delta--;
                 if(render){
                     updl++;

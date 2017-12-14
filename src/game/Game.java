@@ -60,6 +60,13 @@ public class Game implements Runnable{
     public void run() {
         //синхронизированный код
         //ядро, луп
+        int fps = 0;
+        int upd = 0;
+        int updl = 0;
+
+        long count = 0;
+
+
         float delta = 0;
 
         long lasttime = Time.get(); //прошлое время
@@ -68,6 +75,7 @@ public class Game implements Runnable{
             //считаем сколько времени прошло с последнего запуска кода
             long elapsedTime = now - lasttime;
             lasttime = now;
+            count+=elapsedTime;
 
             boolean render = false;
             //кол-во раз сколько должна бежать функция
@@ -75,11 +83,16 @@ public class Game implements Runnable{
             while (delta>1){
                 update();
                 delta--;
-                render = true;
+                if(render){
+                    updl++;
+                }else {
+                    render = true;
+                }
             }
             if (render){
                 //если что-то изменили перерисовываем сцену, а то пульки летать не будут
                 render();
+                fps++;
             }else{
                 //стопим тред
                 try {
@@ -88,7 +101,13 @@ public class Game implements Runnable{
                     e.printStackTrace();
                 }
             }
-
+            if(count>=Time.SECOND){
+                Display.setTitle(TITLE+" || fps:" + fps + " | Upd:" + upd +" | Updl:" + updl);
+                upd = 0;
+                updl = 0;
+                fps = 0;
+                count = 0;
+            }
         }
 
     }

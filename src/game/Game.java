@@ -1,9 +1,12 @@
 package game;
 
+import IO.Input;
 import display.Display;
+import graphics.TextureAtlas;
 import utils.Time;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 public class Game implements Runnable{
     public static final int WIDTH = 800;
@@ -20,18 +23,25 @@ public class Game implements Runnable{
     private boolean running; //флаг запущена ли игра
     private Thread gameThread;
     private Graphics2D graphics;
+    private Input input;
+    private TextureAtlas atlas;
+    public static final String ATLAS_FILE_NAME= "D:\\Battle City JPN.png";
 
     // temp
     float x = 350;
     float y = 250;
     float delta = 0;
     float radius = 50;
+    float speed = 3;
     //temp end
 
     public Game(){
         running=false;
         Display.created(WIDTH,HEIGHT,TITLE,CLEAR_COLOR,NUM_BUFFERS);
         graphics = Display.getGraphics();
+        input = new Input();
+        Display.addInputListener(input);
+        atlas = new TextureAtlas(ATLAS_FILE_NAME);
 
     }
 
@@ -61,14 +71,23 @@ public class Game implements Runnable{
     }
     private void update(){
         //физика игры
-        delta+=0.02f;
+        //delta+=0.02f;
+        if(input.getKey(KeyEvent.VK_UP))
+            y-=speed;
+        if(input.getKey(KeyEvent.VK_DOWN))
+            y+=speed;
+        if(input.getKey(KeyEvent.VK_LEFT))
+            x-=speed;
+        if(input.getKey(KeyEvent.VK_RIGHT))
+            x+=speed;
     }
 
     private void render(){
         //прорисовка сцен вахаха, пульки пульки
         Display.clear();
         graphics.setColor(Color.white);
-        graphics.fillOval((int)(x+(Math.sin(delta)*200)),(int)y,(int)radius*2,(int)radius*2);
+//        graphics.fillOval((int)(x+(Math.sin(delta)*200)),(int)y,(int)radius*2,(int)radius*2);
+        graphics.drawImage(atlas.cut(0,0,32,32),300,300,null);
         Display.swapBuffers();
     }
 

@@ -2,6 +2,8 @@ package game;
 
 import IO.Input;
 import display.Display;
+import graphics.Sprite;
+import graphics.SpriteSheet;
 import graphics.TextureAtlas;
 import utils.Time;
 
@@ -25,7 +27,9 @@ public class Game implements Runnable{
     private Graphics2D graphics;
     private Input input;
     private TextureAtlas atlas;
-    public static final String ATLAS_FILE_NAME= "G:\\IDEAProjects\\texture_atlas.png";
+    private SpriteSheet sheet;
+    private Sprite sprite;
+    public static final String ATLAS_FILE_NAME= "Battle City JPN.png";
 
     // temp
     float x = 350;
@@ -42,6 +46,9 @@ public class Game implements Runnable{
         input = new Input();
         Display.addInputListener(input);
         atlas = new TextureAtlas(ATLAS_FILE_NAME);
+        //сопстно передаем координаты дчтобы порезать картинку
+        sheet = new SpriteSheet(atlas.cut(1*16,9*16,16*2,16),2,16);
+        sprite = new Sprite(sheet,1);
 
     }
 
@@ -87,8 +94,9 @@ public class Game implements Runnable{
         Display.clear();
         graphics.setColor(Color.white);
 //        graphics.fillOval((int)(x+(Math.sin(delta)*200)),(int)y,(int)radius*2,(int)radius*2);
-        //танк
-        graphics.drawImage(atlas.cut(0,0,16,16),300,300,null);
+//        graphics.drawImage(atlas.cut(0,0,32,32),300,300,null);
+        //заменили т.к. написали функцию которая вычисляет танк
+        sprite.render(graphics, x, y);
         Display.swapBuffers();
     }
 

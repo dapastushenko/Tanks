@@ -25,7 +25,7 @@ public class Game implements Runnable{
     private Graphics2D graphics;
     private Input input;
     private TextureAtlas atlas;
-    public static final String ATLAS_FILE_NAME= "D:\\Battle City JPN.png";
+    public static final String ATLAS_FILE_NAME= "G:\\IDEAProjects\\texture_atlas.png";
 
     // temp
     float x = 350;
@@ -87,7 +87,8 @@ public class Game implements Runnable{
         Display.clear();
         graphics.setColor(Color.white);
 //        graphics.fillOval((int)(x+(Math.sin(delta)*200)),(int)y,(int)radius*2,(int)radius*2);
-        graphics.drawImage(atlas.cut(0,0,32,32),300,300,null);
+        //танк
+        graphics.drawImage(atlas.cut(0,0,16,16),300,300,null);
         Display.swapBuffers();
     }
 

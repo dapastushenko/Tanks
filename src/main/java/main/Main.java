@@ -1,10 +1,6 @@
 package main;
 
-import display.Display;
 import game.Game;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 
 public class Main {
 

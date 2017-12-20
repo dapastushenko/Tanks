@@ -17,7 +17,7 @@ public abstract class Entity {
         this.x = x;
         this.y = y;
     }
-    protected abstract void update(Input input);
-    protected abstract void render(Graphics2D g);
+    public abstract void update(Input input);
+    public abstract void render(Graphics2D g);
 
 }

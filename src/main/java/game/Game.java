@@ -2,13 +2,11 @@ package game;
 
 import IO.Input;
 import display.Display;
-import graphics.Sprite;
-import graphics.SpriteSheet;
+import game.level.Level;
 import graphics.TextureAtlas;
 import utils.Time;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 
 public class Game implements Runnable {
     public static final int WIDTH = 800;
@@ -28,6 +26,7 @@ public class Game implements Runnable {
     private Input input;
     private TextureAtlas atlas;
     private Player player;
+    private Level lvl;
 
     public static final String ATLAS_FILE_NAME = "Battle City JPN.png";
 
@@ -40,6 +39,7 @@ public class Game implements Runnable {
         atlas = new TextureAtlas(ATLAS_FILE_NAME);
         //сопстно передаем координаты чтобы порезать картинку
         player = new Player(300, 300, 2, 3, atlas);
+        lvl = new Level(atlas);
     }
 
     public synchronized void start() {
@@ -72,12 +72,15 @@ public class Game implements Runnable {
     private void update() {
         //физика игры
         player.update(input);
+        lvl.update();
     }
 
     private void render() {
         //прорисовка сцен вахаха, пульки пульки
         Display.clear();
+        lvl.render(graphics);
         player.render(graphics);
+        lvl.renderGrass(graphics);
         Display.swapBuffers();
     }
 

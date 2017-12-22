@@ -8,7 +8,7 @@ import java.io.IOException;
 public class ResourceLoader {
     public static final String PATH = "resources/";
 
-    public static BufferedImage loadImege(String fileName) {
+    public static BufferedImage loadImage(String fileName) {
         BufferedImage image = null;
 
         try {

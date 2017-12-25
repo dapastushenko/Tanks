@@ -1,8 +1,6 @@
 package display;
 
 
-
-
 import IO.Input;
 
 import java.awt.*;
@@ -28,7 +26,7 @@ public class Display {
     private static float delta = 0;
     //temp end
 
-    public static void created(int width,int height, String title, int _clearColor, int numBuffers){
+    public static void created(int width, int height, String title, int _clearColor, int numBuffers) {
         if (created)
             return;
 
@@ -36,7 +34,7 @@ public class Display {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         content = new Canvas();
 
-        Dimension size = new Dimension(width,height);
+        Dimension size = new Dimension(width, height);
         content.setPreferredSize(size);
 
         window.setResizable(false);
@@ -45,39 +43,41 @@ public class Display {
         window.setLocationRelativeTo(null);
         window.setVisible(true);
 
-        buffer = new BufferedImage(width,height,BufferedImage.TYPE_INT_ARGB);
-        bufferDate = ((DataBufferInt)buffer.getRaster().getDataBuffer()).getData();
+        buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        bufferDate = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
         bufferGraphics = buffer.getGraphics();
-        ((Graphics2D)bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON); //сглаживание объектов
+        ((Graphics2D) bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //сглаживание объектов
         clearColor = _clearColor;
 
         content.createBufferStrategy(numBuffers);
         bufferStrategy = content.getBufferStrategy();
 
-        created=true;
-    }
-    public static void clear(){
-        Arrays.fill(bufferDate,clearColor);
+        created = true;
     }
 
-    public static void swapBuffers(){
-        Graphics g  = bufferStrategy.getDrawGraphics();
-        g.drawImage(buffer,0,0,null);
+    public static void clear() {
+        Arrays.fill(bufferDate, clearColor);
+    }
+
+    public static void swapBuffers() {
+        Graphics g = bufferStrategy.getDrawGraphics();
+        g.drawImage(buffer, 0, 0, null);
         bufferStrategy.show();
     }
 
-    public static Graphics2D getGraphics(){
-        return (Graphics2D)bufferGraphics;
+    public static Graphics2D getGraphics() {
+        return (Graphics2D) bufferGraphics;
     }
 
-    public static void destroy(){
+    public static void destroy() {
         //уничтожение окна
-        if(!created)
+        if (!created)
             return;
 
         window.dispose();
     }
-    public static void setTitle(String title){
+
+    public static void setTitle(String title) {
         window.setTitle(title);
     }
 
@@ -91,7 +91,7 @@ public class Display {
     }
 */
 
-    public static void addInputListener(Input inputListener){
+    public static void addInputListener(Input inputListener) {
         window.add(inputListener);
     }
 }

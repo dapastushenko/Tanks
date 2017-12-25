@@ -13,14 +13,14 @@ public class SpriteSheet {
         this.sheet = sheet;
         this.spriteCount = spriteCount;
         this.scale = scale;
-        this.spritesInWidth = sheet.getWidth()/scale;
+        this.spritesInWidth = sheet.getWidth() / scale;
     }
 
     public BufferedImage getSprite(int index) {
         //вычисляем танк
         index = index % spriteCount;
         int x = index % spritesInWidth * scale;
-        int y  = index / spritesInWidth * scale;
+        int y = index / spritesInWidth * scale;
         return sheet.getSubimage(x, y, scale, scale);
     }
 }

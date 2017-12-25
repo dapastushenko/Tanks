@@ -1,6 +1,7 @@
 package game;
 
 import IO.Input;
+
 import java.awt.*;
 
 public abstract class Entity {
@@ -17,7 +18,9 @@ public abstract class Entity {
         this.x = x;
         this.y = y;
     }
+
     public abstract void update(Input input);
+
     public abstract void render(Graphics2D g);
 
 }

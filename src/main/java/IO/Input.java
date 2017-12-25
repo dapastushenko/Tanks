@@ -4,19 +4,19 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 
-public class Input extends JComponent{
+public class Input extends JComponent {
     //управление
     private boolean[] map;
 
 
-    public Input(){
+    public Input() {
 
         map = new boolean[256];
 
-        for(int i = 0; i < map.length; i++){
+        for (int i = 0; i < map.length; i++) {
             final int KEY_CODE = i;
 
-            getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(i,0,false),i*2); //обрабатываем нажатие кнопки
+            getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(i, 0, false), i * 2); //обрабатываем нажатие кнопки
             getActionMap().put(i * 2, new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -24,8 +24,8 @@ public class Input extends JComponent{
                 }
             });
 
-            getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(i,0,true),i*2+1); //обрабатываем нажатие кнопки
-            getActionMap().put(i * 2+1, new AbstractAction() {
+            getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(i, 0, true), i * 2 + 1); //обрабатываем нажатие кнопки
+            getActionMap().put(i * 2 + 1, new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     map[KEY_CODE] = false;
@@ -34,12 +34,13 @@ public class Input extends JComponent{
         }
 
 
+    }
 
+    public boolean[] getMap() {
+        return Arrays.copyOf(map, map.length);
     }
-    public  boolean[] getMap(){
-        return Arrays.copyOf(map,map.length);
-    }
-    public  boolean getKey(int keyCode){
+
+    public boolean getKey(int keyCode) {
         return map[keyCode];
     }
 

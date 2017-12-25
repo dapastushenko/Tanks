@@ -16,7 +16,7 @@ public class Utils {
     }
 
     public static Integer[][] lvlParser(String filePath) {
-        Integer[][] result=null;
+        Integer[][] result = null;
         try (BufferedReader reader = new BufferedReader(new FileReader(new File(filePath)))) {
             String line = null;
             List<Integer[]> lvlLines = new ArrayList<>();

@@ -96,7 +96,7 @@ public class Player extends Entity {
     @Override
     public void render(Graphics2D g) {
 //проверка направления стороны и вытаскивание нужной картинки(Sprite)
-spriteMap.get(heading).render(g,x,y);//получаем спрайт
+        spriteMap.get(heading).render(g, x, y);//получаем спрайт
 
     }
 }

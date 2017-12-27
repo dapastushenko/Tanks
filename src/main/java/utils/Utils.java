@@ -16,11 +16,11 @@ public class Utils {
     }
 
 
-    public Integer[][] lvlParser(String filePath) {
+    public static Integer[][] lvlParser(String filePath) {
         Integer[][] result = null;
         InputStream in;
-        in = getClass().getResourceAsStream(filePath);
-
+//        in = getClass().getResourceAsStream(filePath);
+        in = ClassLoader.getSystemResourceAsStream(filePath);
 //        in = getClass().getResourceAsStream("");
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
 //      try (BufferedReader reader = new BufferedReader(new FileReader(new File(filePath)))) {

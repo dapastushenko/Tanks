@@ -2,6 +2,7 @@ package game.level;
 
 import game.Game;
 import graphics.TextureAtlas;
+import utils.Utils;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -16,12 +17,12 @@ public class Level {
     public static final int TILE_IN_WIDTH = Game.WIDTH / SCALED_TILES_SIZE;
     public static final int TILE_IN_HEIGHT = Game.HEIGHT / SCALED_TILES_SIZE;
 
-    private int[][] tileMap;
+    private Integer[][] tileMap;
     private Map<TileType, Tile> tiles;
     private List<Point> grassCords;
 
     public Level(TextureAtlas atlas) {
-        tileMap = new int[TILE_IN_WIDTH][TILE_IN_HEIGHT];
+        tileMap = new Integer[TILE_IN_WIDTH][TILE_IN_HEIGHT];
         tiles = new HashMap<TileType, Tile>();
         tiles.put(TileType.BRICK, new Tile(atlas.cut(32 * TILE_SCALE, 0 * TILE_SCALE, TILE_SCALE, TILE_SCALE), TILE_IN_GAME_SCALE, TileType.BRICK));
         tiles.put(TileType.METAL, new Tile(atlas.cut(32 * TILE_SCALE, 2 * TILE_SCALE, TILE_SCALE, TILE_SCALE), TILE_IN_GAME_SCALE, TileType.METAL));
@@ -29,7 +30,9 @@ public class Level {
         tiles.put(TileType.GRASS, new Tile(atlas.cut(34 * TILE_SCALE, 4 * TILE_SCALE, TILE_SCALE, TILE_SCALE), TILE_IN_GAME_SCALE, TileType.GRASS));
         tiles.put(TileType.ICE, new Tile(atlas.cut(36 * TILE_SCALE, 4 * TILE_SCALE, TILE_SCALE, TILE_SCALE), TILE_IN_GAME_SCALE, TileType.ICE));
         tiles.put(TileType.EMPTY, new Tile(atlas.cut(36 * TILE_SCALE, 6 * TILE_SCALE, TILE_SCALE, TILE_SCALE), TILE_IN_GAME_SCALE, TileType.EMPTY));
-// tileMap = наименование файла
+
+        // tileMap = наименование файла
+        tileMap = Utils.lvlParser("level.lvl");
         grassCords = new ArrayList<Point>();
         for (int i = 0; i < tileMap.length; i++) {
             for (int j = 0; i < tileMap.length; j++) {
@@ -64,6 +67,5 @@ public class Level {
         for (Point p : grassCords) {
             tiles.get(TileType.GRASS).render(g, p.x, p.y);
         }
-
     }
 }

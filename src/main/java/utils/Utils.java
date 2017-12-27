@@ -15,9 +15,15 @@ public class Utils {
         return newImage;
     }
 
-    public static Integer[][] lvlParser(String filePath) {
+
+    public Integer[][] lvlParser(String filePath) {
         Integer[][] result = null;
-        try (BufferedReader reader = new BufferedReader(new FileReader(new File(filePath)))) {
+        InputStream in;
+        in = getClass().getResourceAsStream(filePath);
+
+//        in = getClass().getResourceAsStream("");
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+//      try (BufferedReader reader = new BufferedReader(new FileReader(new File(filePath)))) {
             String line = null;
             List<Integer[]> lvlLines = new ArrayList<>();
             while ((line = reader.readLine()) != null) {
@@ -32,7 +38,7 @@ public class Utils {
         }
 
 
-        return null;
+        return result;
     }
 
     public static final Integer[] str2int_arrays(String[] sArr) {

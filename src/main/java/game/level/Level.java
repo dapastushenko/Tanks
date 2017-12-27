@@ -32,10 +32,11 @@ public class Level {
         tiles.put(TileType.EMPTY, new Tile(atlas.cut(36 * TILE_SCALE, 6 * TILE_SCALE, TILE_SCALE, TILE_SCALE), TILE_IN_GAME_SCALE, TileType.EMPTY));
 
         // tileMap = наименование файла
+
         tileMap = Utils.lvlParser("level.lvl");
         grassCords = new ArrayList<Point>();
         for (int i = 0; i < tileMap.length; i++) {
-            for (int j = 0; i < tileMap.length; j++) {
+            for (int j = 0; j < tileMap[i].length; j++) {
                 Tile tile = tiles.get(TileType.fromNumeric(tileMap[i][j]));
                 if (tile.type() == TileType.GRASS) {
 //                    tiles.get(TileType.fromNumeric(tileMap[i][j])).render(g, j * SCALED_TILES_SIZE, i * SCALED_TILES_SIZE);//прыгаем по координатам где находит ся след тайл

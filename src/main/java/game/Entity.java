@@ -11,7 +11,8 @@ public abstract class Entity {
     //местонахождение объектов
     protected float x;
     protected float y;
-
+    protected float height;
+    protected float width;
 
     protected Entity(EntityType type, float x, float y) {
         this.type = type;
@@ -23,4 +24,7 @@ public abstract class Entity {
 
     public abstract void render(Graphics2D g);
 
+//    public boolean isInArea(int x, int y) {
+
+//    }
 }

@@ -1,6 +1,7 @@
 package game;
 
 import IO.Input;
+import game.level.Level;
 import graphics.Sprite;
 import graphics.SpriteSheet;
 import graphics.TextureAtlas;
@@ -22,7 +23,6 @@ public class Player extends Entity {
         EAST(6 * SPRITE_SCALE, 0 * SPRITE_SCALE, SPRITE_SCALE, SPRITE_SCALE),
         SOUTH(4 * SPRITE_SCALE, 0 * SPRITE_SCALE, SPRITE_SCALE, SPRITE_SCALE),
         WEST(2 * SPRITE_SCALE, 0 * SPRITE_SCALE, SPRITE_SCALE, SPRITE_SCALE);
-
         //координаты sprite
         private int x, y, h, w;
 
@@ -76,6 +76,17 @@ public class Player extends Entity {
         } else if (input.getKey(KeyEvent.VK_LEFT)) {
             newX -= speed;
             heading = Heading.WEST;
+        }
+
+//        System.out.println(newX + " " + newY);
+//        input.getKey(KeyEvent.VK_SPACE);
+        for (Point p : Level.tilesCords) {
+//            System.out.println(p.x+" "+p.y);
+            if (newX <= p.x && newY == p.y) {
+                System.out.println("1111");
+                newX = p.x-SPRITE_SCALE*scale;
+                newY = p.y-SPRITE_SCALE*scale;
+            }
         }
 
         if (newX < 0) {

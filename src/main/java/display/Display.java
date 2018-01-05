@@ -81,16 +81,6 @@ public class Display {
         window.setTitle(title);
     }
 
-    /*
-    public static void render(){
-        content.repaint();
-    }
-    private static void render(Graphics g){
-        g.setColor(Color.white);
-        g.fillOval(400-50,300-50,100,100);
-    }
-*/
-
     public static void addInputListener(Input inputListener) {
         window.add(inputListener);
     }

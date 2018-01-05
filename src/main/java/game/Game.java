@@ -73,6 +73,8 @@ public class Game implements Runnable {
         //физика игры
         player.update(input);
         lvl.update();
+
+        // send to all clients: write to ObjectOutputStream
     }
 
     private void render() {

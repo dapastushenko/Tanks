@@ -20,6 +20,7 @@ public class Level {
     private Integer[][] tileMap;
     private Map<TileType, Tile> tiles;
     private List<Point> grassCords;
+    public static List<Point> tilesCords;
 
     public Level(TextureAtlas atlas) {
         tileMap = new Integer[TILE_IN_WIDTH][TILE_IN_HEIGHT];
@@ -35,13 +36,16 @@ public class Level {
 
         tileMap = Utils.lvlParser("level.lvl");
         grassCords = new ArrayList<Point>();
+        tilesCords = new ArrayList<Point>();
         for (int i = 0; i < tileMap.length; i++) {
             for (int j = 0; j < tileMap[i].length; j++) {
                 Tile tile = tiles.get(TileType.fromNumeric(tileMap[i][j]));
                 if (tile.type() == TileType.GRASS) {
 //                    tiles.get(TileType.fromNumeric(tileMap[i][j])).render(g, j * SCALED_TILES_SIZE, i * SCALED_TILES_SIZE);//прыгаем по координатам где находит ся след тайл
                     grassCords.add(new Point(j * SCALED_TILES_SIZE, i * SCALED_TILES_SIZE));
-
+                    tilesCords.add(new Point(j * SCALED_TILES_SIZE, i * SCALED_TILES_SIZE));
+                } else if (tile.type()==TileType.BRICK){
+                    tilesCords.add(new Point(j * SCALED_TILES_SIZE, i * SCALED_TILES_SIZE));
                 }
             }
 

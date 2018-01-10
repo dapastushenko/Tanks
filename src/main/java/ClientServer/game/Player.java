@@ -43,9 +43,12 @@ public class Player extends Entity {
     private Map<Heading, Sprite> spriteMap;
     private float scale;
     private float speed;
+    private float bulletSpeed;
+    private Bullet bullet;
 
-    public Player(float x, float y, float scale, float speed, TextureAtlas atlas) {
-        super(EntityType.Player, x, y);
+
+    public Player(float x, float y, float scale, float speed, TextureAtlas atlas,Level lvl) {
+        super(EntityType.Player, x, y, atlas);
 
         heading = Heading.NORTH;
         spriteMap = new HashMap<Heading, Sprite>();
@@ -77,8 +80,18 @@ public class Player extends Entity {
             newX -= speed;
             heading = Heading.WEST;
         }
+        if (input.getKey(KeyEvent.VK_SPACE)) {
+            if (bullet == null || !bullet.isActive()) {
+                if (Game.getBullets(EntityType.Player).size() == 0) {
+                    bullet = new Bullet(x, y, scale, bulletSpeed, heading.toString().substring(0, 4), atlas, lvl,
+                            EntityType.Player);
+                }
+            }
+        }
 
-//        System.out.println(newX + " " + newY);
+        /*
+эта штука не работает
+//      System.out.println(newX + " " + newY);
 //        input.getKey(KeyEvent.VK_SPACE);
         for (Point p : Level.tilesCords) {
 //            System.out.println(p.x+" "+p.y);
@@ -88,7 +101,7 @@ public class Player extends Entity {
                 newY = p.y - SPRITE_SCALE * scale;
             }
         }
-
+*/
         if (newX < 0) {
             newX = 0;
         } else if (newX >= Game.WIDTH - SPRITE_SCALE * scale) { //проверяем чтобы не уехать за экран
@@ -106,7 +119,7 @@ public class Player extends Entity {
 
     @Override
     public void render(Graphics2D g) {
-//проверка направления стороны и вытаскивание нужной картинки(Sprite)
+        //проверка направления стороны и вытаскивание нужной картинки(Sprite)
         spriteMap.get(heading).render(g, x, y);//получаем спрайт
 
     }

@@ -7,6 +7,10 @@ import ClientServer.graphics.TextureAtlas;
 import ClientServer.utils.Time;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class Game implements Runnable {
     public static final int WIDTH = 800;
@@ -19,6 +23,7 @@ public class Game implements Runnable {
     public static final float UPDATE_RATE = 60.0f; //сколько раз в секунду идет просчет физики, ура танчики едут
     public static final float UPDATE_INTERVAL = Time.SECOND / UPDATE_RATE; //храним время между апдейтами
     public static final long IDLE_TIME = 1; //ожидание для threada время(млсек)
+    private static Map<EntityType, List<Bullet>> bullets;
 
     private boolean running; //флаг запущена ли игра
     private Thread gameThread;
@@ -38,7 +43,9 @@ public class Game implements Runnable {
         Display.addInputListener(input);
         atlas = new TextureAtlas(ATLAS_FILE_NAME);
         //сопстно передаем координаты чтобы порезать картинку
-        player = new Player(300, 300, 2, 3, atlas);
+        bullets = new HashMap<>();
+        bullets.put(EntityType.Player, new LinkedList<Bullet>());
+        player = new Player(300, 300, 2, 3, atlas, lvl);
         lvl = new Level(atlas);
     }
 
@@ -78,12 +85,13 @@ public class Game implements Runnable {
     }
 
     private void render() {
-        //прорисовка сцен вахаха, пульки пульки
+        //прорисовка сцен
         Display.clear();
         lvl.render(graphics);
         player.render(graphics);
         lvl.renderGrass(graphics);
         Display.swapBuffers();
+
     }
 
     @Override
@@ -146,5 +154,16 @@ public class Game implements Runnable {
     private void cleanup() {
         //удаляем окно
         Display.destroy();
+    }
+    public static void registerBullet(EntityType type, Bullet bullet) {
+        bullets.get(type).add(bullet);
+    }
+    public static void unregisterBullet(EntityType type, Bullet bullet) {
+        if (bullets.get(type).size() > 0) {
+            bullets.get(type).remove(bullet);
+        }
+    }
+    public static List<Bullet> getBullets(EntityType type) {
+        return bullets.get(type);
     }
 }

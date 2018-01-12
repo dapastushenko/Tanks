@@ -81,6 +81,8 @@ public class Game implements Runnable {
         player.update(input);
         lvl.update();
 
+        for (int i = 0; i < bullets.get(EntityType.Player).size(); i++)
+            bullets.get(EntityType.Player).get(i).update();
         // send to all clients: write to ObjectOutputStream
     }
 
@@ -89,8 +91,12 @@ public class Game implements Runnable {
         Display.clear();
         lvl.render(graphics);
         player.render(graphics);
+        for (Bullet bullet : getBullets(EntityType.Player))
+            bullet.render(graphics);
         lvl.renderGrass(graphics);
+
         Display.swapBuffers();
+
 
     }
 

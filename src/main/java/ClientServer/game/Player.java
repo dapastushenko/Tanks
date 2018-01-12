@@ -47,14 +47,14 @@ public class Player extends Entity {
     private Bullet bullet;
 
 
-    public Player(float x, float y, float scale, float speed, TextureAtlas atlas,Level lvl) {
+    public Player(float x, float y, float scale, float speed, TextureAtlas atlas, Level lvl) {
         super(EntityType.Player, x, y, atlas);
 
         heading = Heading.NORTH;
         spriteMap = new HashMap<Heading, Sprite>();
         this.scale = scale;
         this.speed = speed;
-
+        bulletSpeed = 6;
         for (Heading h : Heading.values()) {
             SpriteSheet sheet = new SpriteSheet(h.texture(atlas), SPRITES_PER_HEADING, SPRITE_SCALE);
             Sprite sprite = new Sprite(sheet, scale);

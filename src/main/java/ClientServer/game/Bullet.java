@@ -8,6 +8,7 @@ import ClientServer.graphics.TextureAtlas;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,16 +65,16 @@ public class Bullet {
 
         explosionDone = false;
         //допилить кусок
-//        explosionList = new ArrayList<>();
-//        explosionList.add(new Sprite(new SpriteSheet(atlas.cut(16 * Player.SPRITE_SCALE, 8 * Player.SPRITE_SCALE,
-//                Player.SPRITE_SCALE, Player.SPRITE_SCALE), Player.SPRITE_SCALE, Player.SPRITE_SCALE),
-//                scale));
-//        explosionList.add(new Sprite(new SpriteSheet(atlas.cut(17 * Player.SPRITE_SCALE, 8 * Player.SPRITE_SCALE,
-//                Player.SPRITE_SCALE, Player.SPRITE_SCALE), Player.SPRITE_SCALE, Player.SPRITE_SCALE),
-//                scale));
- //       explosionList.add(new Sprite(new SpriteSheet(atlas.cut(18 * Player.SPRITE_SCALE, 8 * Player.SPRITE_SCALE,
- //               Player.SPRITE_SCALE, Player.SPRITE_SCALE), Player.SPRITE_SCALE, Player.SPRITE_SCALE),
- //               scale));
+        explosionList = new ArrayList<>();
+        explosionList.add(new Sprite(new SpriteSheet(atlas.cut(16 * Player.SPRITE_SCALE, 8 * Player.SPRITE_SCALE,
+                Player.SPRITE_SCALE, Player.SPRITE_SCALE), Player.SPRITE_SCALE, Player.SPRITE_SCALE),
+                scale));
+        explosionList.add(new Sprite(new SpriteSheet(atlas.cut(17 * Player.SPRITE_SCALE, 8 * Player.SPRITE_SCALE,
+                Player.SPRITE_SCALE, Player.SPRITE_SCALE), Player.SPRITE_SCALE, Player.SPRITE_SCALE),
+                scale));
+       explosionList.add(new Sprite(new SpriteSheet(atlas.cut(18 * Player.SPRITE_SCALE, 8 * Player.SPRITE_SCALE,
+               Player.SPRITE_SCALE, Player.SPRITE_SCALE), Player.SPRITE_SCALE, Player.SPRITE_SCALE),
+               scale));
 
         for (BulletHeading bh : BulletHeading.values()) {
             SpriteSheet sheet = new SpriteSheet(bh.texture(atlas), Player.SPRITES_PER_HEADING, Player.SPRITE_SCALE / 2);
@@ -87,7 +88,7 @@ public class Bullet {
                 this.x = x + Player.SPRITE_SCALE * scale / 2;
                 this.y = y + (Player.SPRITE_SCALE * scale) / 4;
                 break;
-            case "NORTH":
+            case "NORT":
                 bulletHeading = BulletHeading.B_NORTH;
                 this.x = x + (Player.SPRITE_SCALE * scale) / 4;
                 this.y = y;
@@ -97,7 +98,7 @@ public class Bullet {
                 this.x = x;
                 this.y = y + (Player.SPRITE_SCALE * scale) / 4;
                 break;
-            case "SOUTH":
+            case "SOUT":
                 bulletHeading = BulletHeading.B_SOUTH;
                 this.x = x + (Player.SPRITE_SCALE * scale) / 4;
                 this.y = y + Player.SPRITE_SCALE * scale / 2;
@@ -132,17 +133,17 @@ public class Bullet {
                 break;
         }
 
-        if (type == EntityType.Player) {
-            List<Bullet> enemyBullets = Game.getBullets(EntityType.Enemy);
-            for (Bullet bullet : enemyBullets)
-                if (getRectangle().intersects(bullet.getRectangle())) {
-                    isActive = false;
-                    bullet.setInactive();
-                    bullet.disableExplosion();
-                    explosionDone = true;
-                }
-
-        }
+//        if (type == EntityType.Player) {
+//            List<Bullet> enemyBullets = Game.getBullets(EntityType.Player);
+//            for (Bullet bullet : enemyBullets)
+//                if (getRectangle().intersects(bullet.getRectangle())) {
+//                    isActive = false;
+//                    bullet.setInactive();
+//                    bullet.disableExplosion();
+//                    explosionDone = true;
+//                }
+//
+//        }
 
         if (x < 0 || x >= Game.WIDTH || y < 0 || y > Game.HEIGHT) {
             isActive = false;

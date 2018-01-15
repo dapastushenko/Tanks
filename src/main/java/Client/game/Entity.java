@@ -1,6 +1,8 @@
 package Client.game;
 
-import ClientServer.IO.Input;
+import Client.IO.Input;
+import Client.game.level.Level;
+import Client.graphics.TextureAtlas;
 
 import java.awt.*;
 
@@ -13,11 +15,14 @@ public abstract class Entity {
     protected float y;
     protected float height;
     protected float width;
+    protected TextureAtlas atlas;
+    protected static Level lvl;
 
-    protected Entity(EntityType type, float x, float y) {
+    protected Entity(EntityType type, float x, float y, TextureAtlas atlas) {
         this.type = type;
         this.x = x;
         this.y = y;
+        this.atlas = atlas;
     }
 
     public abstract void update(Input input);

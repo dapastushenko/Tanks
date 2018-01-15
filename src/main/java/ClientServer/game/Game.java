@@ -7,6 +7,7 @@ import ClientServer.graphics.TextureAtlas;
 import ClientServer.utils.Time;
 
 import java.awt.*;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
@@ -63,6 +64,7 @@ public class Game implements Runnable {
         bullets = new HashMap<>();
         bullets.put(EntityType.Player, new LinkedList<Bullet>());
         player = new Player(300, 300, 2, 3, atlas, lvl);
+        player2 = new Player(300, 20, 2, 3, atlas, lvl);
         lvl = new Level(atlas);
     }
 
@@ -96,9 +98,13 @@ public class Game implements Runnable {
                 oin = new ObjectInputStream(sock.getInputStream());
                 oout = new ObjectOutputStream(sock.getOutputStream());
 
-                Cmd cmd = (Cmd)oin.readObject(); // control command
+                Cmd cmd = (Cmd) oin.readObject(); // control command
+
 
                 player2.update(cmd.direction, cmd.isSpace);
+                oout.writeObject(player);
+                oout.writeObject(player2);
+                oout.flush();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -142,7 +148,7 @@ public class Game implements Runnable {
         Display.clear();
         lvl.render(graphics);
         player.render(graphics);
-//        player2.render(graphics);
+        player2.render(graphics);
         for (Bullet bullet : getBullets(EntityType.Player))
             bullet.render(graphics);
         lvl.renderGrass(graphics);
@@ -187,9 +193,21 @@ public class Game implements Runnable {
                 }
             }
             if (render) {
-//                if (srv.oout != null) {
-//                    srv.oout.writeObject(); // lvl, players
-//                }
+
+                if (srv.oout != null) {
+//пример                    srv.oout.writeObject(); // lvl, players
+                    try {
+                        srv.oout.writeObject(player);
+                        srv.oout.writeObject(player2);
+//пока без уровня       srv.oout.writeObject(lvl);
+
+                        srv.oout.flush();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
                 //если что-то изменили перерисовываем сцену
                 render();
                 fps++;
@@ -216,14 +234,17 @@ public class Game implements Runnable {
         //удаляем окно
         Display.destroy();
     }
+
     public static void registerBullet(EntityType type, Bullet bullet) {
         bullets.get(type).add(bullet);
     }
+
     public static void unregisterBullet(EntityType type, Bullet bullet) {
         if (bullets.get(type).size() > 0) {
             bullets.get(type).remove(bullet);
         }
     }
+
     public static List<Bullet> getBullets(EntityType type) {
         return bullets.get(type);
     }

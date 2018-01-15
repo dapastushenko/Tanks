@@ -1,7 +1,7 @@
 package Client.display;
 
 
-import ClientServer.IO.Input;
+import Client.IO.Input;
 
 import javax.swing.*;
 import java.awt.*;
@@ -83,4 +83,6 @@ public class Display {
     public static void addInputListener(Input inputListener) {
         window.add(inputListener);
     }
+
+
 }

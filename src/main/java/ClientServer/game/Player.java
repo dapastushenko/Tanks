@@ -17,7 +17,7 @@ public class Player extends Entity {
     public static final int SPRITE_SCALE = 16; //размер изображения 16 пикселей
     public static final int SPRITES_PER_HEADING = 1;
 
-    private enum Heading {
+    enum Heading {
         //сторона поворота танка
         NORTH(0 * SPRITE_SCALE, 0 * SPRITE_SCALE, 1 * SPRITE_SCALE, 1 * SPRITE_SCALE), //0 и 1 это номера танков в атласе
         EAST(6 * SPRITE_SCALE, 0 * SPRITE_SCALE, SPRITE_SCALE, SPRITE_SCALE),
@@ -64,23 +64,39 @@ public class Player extends Entity {
 
     @Override
     public void update(Input input) {
+        boolean isSpace = input.getKey(KeyEvent.VK_SPACE);
+
+        if (input.getKey(KeyEvent.VK_UP)) {
+            update(Heading.NORTH, isSpace);
+        } else if (input.getKey(KeyEvent.VK_RIGHT)) {
+            update(Heading.EAST, isSpace);
+        } else if (input.getKey(KeyEvent.VK_DOWN)) {
+            update(Heading.SOUTH, isSpace);
+        } else if (input.getKey(KeyEvent.VK_LEFT)) {
+            update(Heading.WEST, isSpace);
+        } else if (isSpace)
+            update(null, true);
+
+    }
+
+    public synchronized void update(Heading direction, boolean isSpace) {
         float newX = x;
         float newY = y;
 
-        if (input.getKey(KeyEvent.VK_UP)) {
+        if (direction == Heading.NORTH) {
             newY -= speed;
             heading = Heading.NORTH;
-        } else if (input.getKey(KeyEvent.VK_RIGHT)) {
+        } else if (direction == Heading.EAST) {
             newX += speed;
             heading = Heading.EAST;
-        } else if (input.getKey(KeyEvent.VK_DOWN)) {
+        } else if (direction == Heading.SOUTH) {
             newY += speed;
             heading = Heading.SOUTH;
-        } else if (input.getKey(KeyEvent.VK_LEFT)) {
+        } else if (direction == Heading.WEST) {
             newX -= speed;
             heading = Heading.WEST;
         }
-        if (input.getKey(KeyEvent.VK_SPACE)) {
+        if (isSpace) {
             if (bullet == null || !bullet.isActive()) {
                 if (Game.getBullets(EntityType.Player).size() == 0) {
                     bullet = new Bullet(x, y, scale, bulletSpeed, heading.toString().substring(0, 4), atlas, lvl,
@@ -118,7 +134,7 @@ public class Player extends Entity {
     }
 
     @Override
-    public void render(Graphics2D g) {
+    public synchronized void render(Graphics2D g) {
         //проверка направления стороны и вытаскивание нужной картинки(Sprite)
         spriteMap.get(heading).render(g, x, y);//получаем спрайт
 

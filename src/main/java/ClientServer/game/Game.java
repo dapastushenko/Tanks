@@ -7,6 +7,10 @@ import ClientServer.graphics.TextureAtlas;
 import ClientServer.utils.Time;
 
 import java.awt.*;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,15 +29,28 @@ public class Game implements Runnable {
     public static final long IDLE_TIME = 1; //ожидание для threada время(млсек)
     private static Map<EntityType, List<Bullet>> bullets;
 
+    private List<Bullet> bullets1;
+    private List<Bullet> bullets2;
+
     private boolean running; //флаг запущена ли игра
     private Thread gameThread;
     private Graphics2D graphics;
     private Input input;
     private TextureAtlas atlas;
     private Player player;
+    private Player player2;
     private Level lvl;
 
+    private Server srv;
+
+
     public static final String ATLAS_FILE_NAME = "Battle City JPN.png";
+
+    //не нужно пока что
+    public static final int BUF_SIZE = 1024;
+//    private ServerSocketChannel serverSockCh;
+//    private Selector sel;
+//    private ByteBuffer buffer;
 
     public Game() {
         running = false;
@@ -50,14 +67,47 @@ public class Game implements Runnable {
     }
 
     public synchronized void start() {
-        //старт игры вызываем только одним потоком
+        //старт игры вызыватся только одним потоком
         if (running)
             return;
-
         running = true;
+
         gameThread = new Thread(this);
+
         gameThread.start();
 
+        srv = new Server();
+
+    }
+
+    private class Server extends Thread {
+        ServerSocket serverSocket;
+        Socket sock;
+        ObjectInputStream oin;
+        ObjectOutputStream oout;
+
+        @Override
+        public void run() {
+            try {
+                serverSocket = new ServerSocket(12345);
+
+                sock = serverSocket.accept();
+
+                oin = new ObjectInputStream(sock.getInputStream());
+                oout = new ObjectOutputStream(sock.getOutputStream());
+
+                Cmd cmd = (Cmd)oin.readObject(); // control command
+
+                player2.update(cmd.direction, cmd.isSpace);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static class Cmd {
+        private Player.Heading direction;
+        private boolean isSpace;
     }
 
     public synchronized void stop() {
@@ -79,6 +129,7 @@ public class Game implements Runnable {
     private void update() {
         //физика игры
         player.update(input);
+//        player2.update(direction, isSpace);
         lvl.update();
 
         for (int i = 0; i < bullets.get(EntityType.Player).size(); i++)
@@ -91,6 +142,7 @@ public class Game implements Runnable {
         Display.clear();
         lvl.render(graphics);
         player.render(graphics);
+//        player2.render(graphics);
         for (Bullet bullet : getBullets(EntityType.Player))
             bullet.render(graphics);
         lvl.renderGrass(graphics);
@@ -135,7 +187,10 @@ public class Game implements Runnable {
                 }
             }
             if (render) {
-                //если что-то изменили перерисовываем сцену, а то пульки летать не будут
+//                if (srv.oout != null) {
+//                    srv.oout.writeObject(); // lvl, players
+//                }
+                //если что-то изменили перерисовываем сцену
                 render();
                 fps++;
             } else {

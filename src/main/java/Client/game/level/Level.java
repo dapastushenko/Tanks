@@ -1,8 +1,8 @@
 package Client.game.level;
 
 import Client.game.Game;
-import ClientServer.graphics.TextureAtlas;
-import ClientServer.utils.Utils;
+import Client.graphics.TextureAtlas;
+import Client.utils.Utils;
 
 import java.awt.*;
 import java.util.ArrayList;

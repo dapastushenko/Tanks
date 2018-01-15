@@ -1,6 +1,6 @@
 package Client.game.level;
 
-import ClientServer.utils.Utils;
+import Client.utils.Utils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

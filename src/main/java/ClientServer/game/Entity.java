@@ -5,8 +5,9 @@ import ClientServer.game.level.Level;
 import ClientServer.graphics.TextureAtlas;
 
 import java.awt.*;
+import java.io.Serializable;
 
-public abstract class Entity {
+public abstract class Entity implements Serializable {
 
     public final EntityType type;
 
@@ -15,8 +16,8 @@ public abstract class Entity {
     protected float y;
     protected float height;
     protected float width;
-    protected TextureAtlas atlas;
-    protected static Level lvl;
+    transient protected TextureAtlas atlas;
+    transient protected static Level lvl;
 
     protected Entity(EntityType type, float x, float y, TextureAtlas atlas) {
         this.type = type;

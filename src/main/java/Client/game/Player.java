@@ -9,13 +9,15 @@ import Client.graphics.TextureAtlas;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Player extends Entity {
+public class Player extends Entity implements Serializable {
 
     public static final int SPRITE_SCALE = 16; //размер изображения 16 пикселей
     public static final int SPRITES_PER_HEADING = 1;
+
 
     enum Heading {
         //сторона поворота танка
@@ -40,15 +42,19 @@ public class Player extends Entity {
     }
 
     private Heading heading;
-    private Map<Heading, Sprite> spriteMap;
+    transient private Map<Heading, Sprite> spriteMap;
     private float scale;
     private float speed;
     private float bulletSpeed;
     private Bullet bullet;
 
+    public Player(EntityType type, float x, float y, TextureAtlas atlas) {
+        super(type, x, y, atlas);
+    }
 
     public Player(float x, float y, float scale, float speed, TextureAtlas atlas, Level lvl) {
         super(EntityType.Player, x, y, atlas);
+
 
         heading = Heading.NORTH;
         spriteMap = new HashMap<Heading, Sprite>();

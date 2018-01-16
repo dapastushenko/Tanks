@@ -3,8 +3,9 @@ package ClientServer.graphics;
 import ClientServer.utils.ResourceLoader;
 
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 
-public class TextureAtlas {
+public class TextureAtlas implements Serializable {
     BufferedImage image;
 
     public TextureAtlas(String imageName) {

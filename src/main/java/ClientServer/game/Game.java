@@ -10,6 +10,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -79,6 +80,7 @@ public class Game implements Runnable {
         gameThread.start();
 
         srv = new Server();
+        srv.start();
 
     }
 
@@ -103,7 +105,8 @@ public class Game implements Runnable {
 
                 player2.update(cmd.direction, cmd.isSpace);
                 oout.writeObject(player);
-                oout.writeObject(player2);
+                System.out.println(oout);
+//                oout.writeObject(player2);
                 oout.flush();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -111,9 +114,10 @@ public class Game implements Runnable {
         }
     }
 
-    private static class Cmd {
+    private static class Cmd implements Serializable {
         private Player.Heading direction;
         private boolean isSpace;
+
     }
 
     public synchronized void stop() {
@@ -154,8 +158,6 @@ public class Game implements Runnable {
         lvl.renderGrass(graphics);
 
         Display.swapBuffers();
-
-
     }
 
     @Override
@@ -197,6 +199,7 @@ public class Game implements Runnable {
                 if (srv.oout != null) {
 //пример                    srv.oout.writeObject(); // lvl, players
                     try {
+                        System.out.println("111");
                         srv.oout.writeObject(player);
                         srv.oout.writeObject(player2);
 //пока без уровня       srv.oout.writeObject(lvl);

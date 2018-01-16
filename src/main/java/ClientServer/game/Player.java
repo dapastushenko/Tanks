@@ -9,10 +9,11 @@ import ClientServer.graphics.TextureAtlas;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Player extends Entity {
+public class Player extends Entity implements Serializable {
 
     public static final int SPRITE_SCALE = 16; //размер изображения 16 пикселей
     public static final int SPRITES_PER_HEADING = 1;
@@ -40,7 +41,7 @@ public class Player extends Entity {
     }
 
     private Heading heading;
-    private Map<Heading, Sprite> spriteMap;
+    transient private Map<Heading, Sprite> spriteMap;
     private float scale;
     private float speed;
     private float bulletSpeed;

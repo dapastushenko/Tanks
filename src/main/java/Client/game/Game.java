@@ -11,8 +11,11 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,7 +47,7 @@ public class Game implements Runnable {
     private Level lvl;
 
     private Client client;
-
+    public ObjectOutputStream oout;
 
     public static final String ATLAS_FILE_NAME = "Battle City JPN.png";
 
@@ -80,52 +83,55 @@ public class Game implements Runnable {
         gameThread.start();
 
         client = new Client();
-
+        client.start();
     }
 
-    private class Client extends Thread {
+    protected class Client extends Thread {
         ServerSocket serverSocket;
+
         Socket sock;
+        //        SocketAddress socketAddress;
         ObjectInputStream oin;
-        ObjectOutputStream oout;
+//        ObjectOutputStream oout;
 
         @Override
         public void run() {
-            boolean isSpace = input.getKey(KeyEvent.VK_SPACE);
+
+
             try {
-                serverSocket = new ServerSocket(12345);
+//                serverSocket = new ServerSocket(12345);
+//                sock = serverSocket.accept();
+                sock = new Socket();
 
-                sock = serverSocket.accept();
-
-                oin = new ObjectInputStream(sock.getInputStream());
+                sock.connect(new InetSocketAddress("localhost", 12345));
+                System.out.printf("gg");
                 oout = new ObjectOutputStream(sock.getOutputStream());
+                oin = new ObjectInputStream(sock.getInputStream());
 
-                Player playerIn = (Player) oin.readObject();
 
-                //Cmd cmd = (Cmd) oin.readObject(); // control command
-//                if (input.getKey(KeyEvent.VK_UP)) {
-//                    oout.writeObject(new Cmd(Player.Heading.NORTH, isSpace));
-//                } else if (input.getKey(KeyEvent.VK_RIGHT)) {
-//                    update(Player.Heading.EAST, isSpace);
-//                } else if (input.getKey(KeyEvent.VK_DOWN)) {
-//                    update(Player.Heading.SOUTH, isSpace);
-//                } else if (input.getKey(KeyEvent.VK_LEFT)) {
-//                    update(Player.Heading.WEST, isSpace);
-//                } else if (isSpace)
-//                    update(null, true);
-//                Cmd cmd = (Cmd) oout.writeObject();
 
-                player2.update(cmd.direction, cmd.isSpace);
-
-            } catch (Exception e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
+
+
+            //Cmd cmd = (Cmd) oin.readObject(); // control command
+
+//                Cmd cmd = (Cmd) oout.writeObject();
+
+//                player2.update(cmd.direction, cmd.isSpace);
+
         }
     }
 
-    private static class Cmd {
+    private static class Cmd implements Serializable {
         private Player.Heading direction;
         private boolean isSpace;
+
+        protected Cmd(Player.Heading direction, boolean isSpace) {
+            this.direction = direction;
+            this.isSpace = isSpace;
+        }
     }
 
     public synchronized void stop() {
@@ -146,8 +152,32 @@ public class Game implements Runnable {
 
     private void update() {
         //физика игры
-        player.update(input);
 
+//        player.update(input);
+        try {
+            if (input.getKey(KeyEvent.VK_UP)) {
+                Cmd cmd = new Cmd(Player.Heading.NORTH, false);
+//                oout.writeObject(new Cmd(Player.Heading.NORTH, false));
+                oout.writeObject(cmd);
+
+            } else if (input.getKey(KeyEvent.VK_RIGHT)) {
+                oout.writeObject(new Cmd(Player.Heading.EAST, false));
+//                update(Player.Heading.EAST, isSpace);
+            } else if (input.getKey(KeyEvent.VK_DOWN)) {
+
+                oout.writeObject(new Cmd(Player.Heading.SOUTH, false));
+//                update(Player.Heading.SOUTH, isSpace);
+            } else if (input.getKey(KeyEvent.VK_LEFT)) {
+                oout.writeObject(new Cmd(Player.Heading.WEST, false));
+//                update(Player.Heading.WEST, isSpace);
+//            } else if (isSpace)
+//                oout.writeObject(null, false);
+
+//                update(null, true)
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 //        player2.update(direction, isSpace);
         lvl.update();
 
@@ -206,7 +236,18 @@ public class Game implements Runnable {
                 }
             }
             if (render) {
-////
+
+if (client.oin !=null) {
+    try {
+        player = (Player) client.oin.readObject();
+    } catch (IOException e) {
+        e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+
+    }
+}
+
 //                if (srv.oout != null) {
 ////                    srv.oout.writeObject(); // lvl, players
 //                try {

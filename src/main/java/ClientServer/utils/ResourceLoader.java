@@ -5,9 +5,10 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.List;
 
-public class ResourceLoader {
+public class ResourceLoader implements Serializable {
 //    public static final String PATH = "resources/";
 
     public static BufferedImage loadImage(String fileName) {

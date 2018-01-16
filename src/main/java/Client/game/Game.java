@@ -1,10 +1,10 @@
 package Client.game;
 
-import Client.IO.Input;
-import Client.display.Display;
-import Client.game.level.Level;
-import Client.graphics.TextureAtlas;
-import Client.utils.Time;
+import ClientServer.IO.Input;
+import ClientServer.display.Display;
+import ClientServer.game.level.Level;
+import ClientServer.graphics.TextureAtlas;
+import ClientServer.utils.Time;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -15,7 +15,6 @@ import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,8 +41,8 @@ public class Game implements Runnable {
     private Graphics2D graphics;
     private Input input;
     private TextureAtlas atlas;
-    private Player player;
-    private Player player2;
+    private ClientServer.game.Player player;
+    private ClientServer.game.Player player2;
     private Level lvl;
 
     private Client client;
@@ -67,8 +66,8 @@ public class Game implements Runnable {
         //сопстно передаем координаты чтобы порезать картинку
         bullets = new HashMap<>();
         bullets.put(EntityType.Player, new LinkedList<Bullet>());
-        player = new Player(300, 300, 2, 3, atlas, lvl);
-        player2 = new Player(300, 20, 2, 3, atlas, lvl);
+        player = new ClientServer.game.Player(300, 300, 2, 3, atlas, lvl);
+        player2 = new ClientServer.game.Player(300, 20, 2, 3, atlas, lvl);
         lvl = new Level(atlas);
     }
 
@@ -104,7 +103,7 @@ public class Game implements Runnable {
                 sock = new Socket();
 
                 sock.connect(new InetSocketAddress("localhost", 12345));
-                System.out.printf("gg");
+                System.out.printf("ggg");
                 oout = new ObjectOutputStream(sock.getOutputStream());
                 oin = new ObjectInputStream(sock.getInputStream());
 
@@ -159,12 +158,10 @@ public class Game implements Runnable {
                 Cmd cmd = new Cmd(Player.Heading.NORTH, false);
 //                oout.writeObject(new Cmd(Player.Heading.NORTH, false));
                 oout.writeObject(cmd);
-
             } else if (input.getKey(KeyEvent.VK_RIGHT)) {
                 oout.writeObject(new Cmd(Player.Heading.EAST, false));
 //                update(Player.Heading.EAST, isSpace);
             } else if (input.getKey(KeyEvent.VK_DOWN)) {
-
                 oout.writeObject(new Cmd(Player.Heading.SOUTH, false));
 //                update(Player.Heading.SOUTH, isSpace);
             } else if (input.getKey(KeyEvent.VK_LEFT)) {
@@ -239,12 +236,9 @@ public class Game implements Runnable {
 
 if (client.oin !=null) {
     try {
-        player = (Player) client.oin.readObject();
-    } catch (IOException e) {
+        player = (ClientServer.game.Player) client.oin.readObject();
+    } catch (IOException | ClassNotFoundException e) {
         e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-        e.printStackTrace();
-
     }
 }
 

@@ -1,4 +1,5 @@
 package Client.game;
+
 import Client.game.level.Level;
 import Client.graphics.Sprite;
 import Client.graphics.SpriteSheet;
@@ -8,12 +9,13 @@ import ClientServer.game.Player;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Bullet {
+public class Bullet implements Serializable {
     public enum BulletHeading {
         B_NORTH(20 * Player.SPRITE_SCALE, 6 * Player.SPRITE_SCALE + 4, Player.SPRITE_SCALE / 2,
                 1 * Player.SPRITE_SCALE / 2),
@@ -47,7 +49,7 @@ public class Bullet {
     private float y;
     private float scale;
     private boolean isActive;
-    private Level lvl;
+    transient private Level lvl;
     private EntityType type;
     private boolean explosionDone;
     private List<Sprite> explosionList;
@@ -150,6 +152,7 @@ public class Bullet {
         }
 
     }
+
     public void render(Graphics2D g) {
         if (!isActive && explosionDone) {
             Game.unregisterBullet(type, this);
@@ -162,6 +165,7 @@ public class Bullet {
             spriteMap.get(bulletHeading).render(g, x, y);
         }
     }
+
     public void drawExplosion(Graphics2D g) {
         if (explosionDone)
             return;
@@ -193,9 +197,11 @@ public class Bullet {
     public boolean isActive() {
         return isActive;
     }
+
     public void setInactive() {
         isActive = false;
     }
+
     public void disableExplosion() {
         explosionDone = true;
     }

@@ -4,8 +4,9 @@ import Client.utils.Utils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 
-public class Sprite {
+public class Sprite implements Serializable {
     //тащим одно изображение из SpriteSheet
     private SpriteSheet sheet;
     private float scale; //на сколько большим рисуем изображение на сцене

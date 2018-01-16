@@ -18,6 +18,7 @@ public class Player extends Entity implements Serializable {
     public static final int SPRITE_SCALE = 16; //размер изображения 16 пикселей
     public static final int SPRITES_PER_HEADING = 1;
 
+
     enum Heading {
         //сторона поворота танка
         NORTH(0 * SPRITE_SCALE, 0 * SPRITE_SCALE, 1 * SPRITE_SCALE, 1 * SPRITE_SCALE), //0 и 1 это номера танков в атласе
@@ -56,6 +57,16 @@ public class Player extends Entity implements Serializable {
         this.scale = scale;
         this.speed = speed;
         bulletSpeed = 6;
+        for (Heading h : Heading.values()) {
+            SpriteSheet sheet = new SpriteSheet(h.texture(atlas), SPRITES_PER_HEADING, SPRITE_SCALE);
+            Sprite sprite = new Sprite(sheet, scale);
+            spriteMap.put(h, sprite);
+        }
+    }
+
+    public void FillSpriteMap() {
+        spriteMap = new HashMap<Heading, Sprite>();
+
         for (Heading h : Heading.values()) {
             SpriteSheet sheet = new SpriteSheet(h.texture(atlas), SPRITES_PER_HEADING, SPRITE_SCALE);
             Sprite sprite = new Sprite(sheet, scale);
@@ -137,6 +148,8 @@ public class Player extends Entity implements Serializable {
     @Override
     public synchronized void render(Graphics2D g) {
         //проверка направления стороны и вытаскивание нужной картинки(Sprite)
+        if (spriteMap == null)
+            FillSpriteMap();
         spriteMap.get(heading).render(g, x, y);//получаем спрайт
 
     }

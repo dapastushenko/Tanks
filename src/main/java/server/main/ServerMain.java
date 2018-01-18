@@ -2,7 +2,7 @@ package server.main;
 
 import server.game.ServerGame;
 
-public class Main {
+public class ServerMain {
 
     public static void main(String[] args) {
         ServerGame tanks = new ServerGame();

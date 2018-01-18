@@ -111,8 +111,8 @@ public class ClientGame implements Runnable {
                 while (!isInterrupted()) {
                     RenderObject rnd = (RenderObject) oin.readObject();
 
-                    if (LOG.isDebugEnabled())
-                        LOG.debug("Got render object {}", rnd);
+                    if (LOG.isTraceEnabled())
+                        LOG.trace("Got render object {}", rnd);
 
                     rndObject.set(rnd);
                 }
@@ -155,18 +155,23 @@ public class ClientGame implements Runnable {
 
         Command cmd = null;
 
+        boolean isSpace = input.getKey(KeyEvent.VK_SPACE);
+
         if (input.getKey(KeyEvent.VK_UP)) {
-            cmd = new Command(Heading.NORTH, false);
+            cmd = new Command(Heading.NORTH, isSpace);
         }
         else if (input.getKey(KeyEvent.VK_RIGHT)) {
-            cmd = new Command(Heading.EAST, false);
+            cmd = new Command(Heading.EAST, isSpace);
         }
         else if (input.getKey(KeyEvent.VK_DOWN)) {
-            cmd = new Command(Heading.SOUTH, false);
+            cmd = new Command(Heading.SOUTH, isSpace);
         }
         else if (input.getKey(KeyEvent.VK_LEFT)) {
-            cmd = new Command(Heading.WEST, false);
+            cmd = new Command(Heading.WEST, isSpace);
         }
+
+        if (cmd == null && isSpace)
+            cmd = new Command(null, true);
 
         if (cmd != null) {
             assert client != null;
@@ -228,6 +233,9 @@ public class ClientGame implements Runnable {
             }
 
             RenderObject rnd = client.getRenderObject();
+
+            if (LOG.isTraceEnabled())
+                LOG.trace("Ready render object {}", rnd);
 
             if (rnd != null) {
                 assert client != null;

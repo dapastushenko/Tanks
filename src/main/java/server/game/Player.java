@@ -4,7 +4,6 @@ import server.IO.Input;
 import server.game.level.Level;
 import server.graphics.Sprite;
 import server.graphics.SpriteSheet;
-import server.graphics.TextureAtlas;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -13,6 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static server.game.PlayerSide.CLIENT;
+import static server.game.PlayerSide.SERVER;
+
 public class Player extends Entity implements Serializable {
 
     public static final int SPRITE_SCALE = 16; //размер изображения 16 пикселей
@@ -20,25 +22,26 @@ public class Player extends Entity implements Serializable {
 
 
     private Heading heading;
-    transient private Map<Heading, Sprite> spriteMap;
+    private transient Map<Heading, Sprite> spriteMap;
     private float scale;
     private float speed;
     private float bulletSpeed;
     private Bullet bullet;
 
-    public String playerName;
+    public PlayerSide side;
     private List<Bullet> bulletList;
 
+    private boolean updated;
 
-    public Player(String playerName, float x, float y, float scale, float speed, TextureAtlas atlas, Level lvl) {
-        super(EntityType.Player, x, y, scale, atlas, lvl);
+    public Player(PlayerSide side, float x, float y, float scale, float speed, Level lvl) {
+        super(EntityType.Player, x, y, scale, lvl);
 
         heading = Heading.NORTH;
         spriteMap = new HashMap<>();
         this.scale = scale;
         this.speed = speed;
         bulletSpeed = 6;
-        this.playerName = playerName;
+        this.side = side;
         for (Heading h : Heading.values()) {
             SpriteSheet sheet = new SpriteSheet(h.texture(atlas), SPRITES_PER_HEADING, SPRITE_SCALE);
             Sprite sprite = new Sprite(sheet, scale);
@@ -46,14 +49,16 @@ public class Player extends Entity implements Serializable {
         }
     }
 
-    public void FillSpriteMap() {
+    public void fillSpriteMap() {
 //при изменении архитектуры обошлизь без этого метода
-        spriteMap = new HashMap<>();
+        if (spriteMap == null) {
+            spriteMap = new HashMap<>();
 
-        for (Heading h : Heading.values()) {
-            SpriteSheet sheet = new SpriteSheet(h.texture(atlas), SPRITES_PER_HEADING, SPRITE_SCALE);
-            Sprite sprite = new Sprite(sheet, scale);
-            spriteMap.put(h, sprite);
+            for (Heading h : Heading.values()) {
+                SpriteSheet sheet = new SpriteSheet(h.texture(atlas), SPRITES_PER_HEADING, SPRITE_SCALE);
+                Sprite sprite = new Sprite(sheet, scale);
+                spriteMap.put(h, sprite);
+            }
         }
     }
 
@@ -78,6 +83,9 @@ public class Player extends Entity implements Serializable {
         float newX = x;
         float newY = y;
 
+        if (direction != null || isSpace)
+            updated = true;
+
         if (direction == Heading.NORTH) {
             newY -= speed;
             heading = Heading.NORTH;
@@ -93,7 +101,7 @@ public class Player extends Entity implements Serializable {
         }
         if (isSpace) {
             if (bullet == null || !bullet.isActive()) {
-                bullet = new Bullet(x, y, scale, bulletSpeed, heading.toString().substring(0, 4), atlas, lvl, EntityType.Player, playerName);
+                bullet = new Bullet(x, y, scale, bulletSpeed, heading.toString().substring(0, 4), atlas, lvl, EntityType.Player, side);
             }
 
 
@@ -162,8 +170,8 @@ public class Player extends Entity implements Serializable {
         }
 //        x = newX;
 //        y = newY;
-        if (playerName == "serverPlayer") {
-            bulletList = ServerGame.getBullets("clientPlayer");
+        if (side == SERVER) {
+            bulletList = ServerGame.getBullets(CLIENT);
             if (bulletList.size()>0) {
                 for (Bullet clientPlayerBullet : bulletList) {
                     if (getRectangle().intersects(clientPlayerBullet.getRectangle()) && clientPlayerBullet.isActive()) {
@@ -172,8 +180,8 @@ public class Player extends Entity implements Serializable {
                     }
                 }
             }
-        } else if (playerName == "clientPlayer") {
-            bulletList = ServerGame.getBullets("serverPlayer");
+        } else if (side == CLIENT) {
+            bulletList = ServerGame.getBullets(SERVER);
             if (bulletList.size()>0) {
                 for (Bullet serverPlayerBullet : bulletList) {
                     if (getRectangle().intersects(serverPlayerBullet.getRectangle())&& serverPlayerBullet.isActive() ) {
@@ -185,17 +193,28 @@ public class Player extends Entity implements Serializable {
         }
 
 
+//        updated = true;
+    }
+
+    public synchronized boolean updated() {
+        boolean upd = updated;
+
+        updated = false;
+
+        return upd;
     }
 
     @Override
     public synchronized void render(Graphics2D g) {
+        fillSpriteMap();
+
         //проверка направления стороны и вытаскивание нужной картинки(Sprite)
         spriteMap.get(heading).render(g, x, y);//получаем спрайт
 
     }
 
-    public String getPlayerName() {
-        return playerName;
+    public PlayerSide getSide() {
+        return side;
     }
 
     @Override
@@ -207,6 +226,27 @@ public class Player extends Entity implements Serializable {
     @Override
     public boolean isAlive() {
         return isAlive;
+    }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "heading=" + heading +
+                ", spriteMap=" + spriteMap +
+                ", scale=" + scale +
+                ", speed=" + speed +
+                ", bulletSpeed=" + bulletSpeed +
+                ", bullet=" + bullet +
+                ", side='" + side + '\'' +
+                ", bulletList=" + bulletList +
+                ", type=" + type +
+                ", x=" + x +
+                ", y=" + y +
+                ", height=" + height +
+                ", width=" + width +
+                ", scale=" + scale +
+                ", isAlive=" + isAlive +
+                '}';
     }
 }
 

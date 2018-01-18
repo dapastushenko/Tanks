@@ -18,6 +18,9 @@ import java.net.Socket;
 import java.util.*;
 import java.util.List;
 
+import static server.game.PlayerSide.CLIENT;
+import static server.game.PlayerSide.SERVER;
+
 public class ServerGame implements Runnable {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 600;
@@ -68,8 +71,8 @@ public class ServerGame implements Runnable {
         clientPlayerBullets = new LinkedList<Bullet>();
         bullets.put(EntityType.Player, new LinkedList<>());
         lvl = new Level();
-        clientPlayer = new Player("clientPlayer", 300, 20, 2, 3, Level.atlas, lvl);
-        serverPlayer = new Player("serverPlayer", 300, 300, 2, 3, Level.atlas, lvl);
+        clientPlayer = new Player(CLIENT, 300, 20, 2, 3, lvl);
+        serverPlayer = new Player(SERVER, 300, 300, 2, 3, lvl);
 
     }
 
@@ -81,13 +84,10 @@ public class ServerGame implements Runnable {
 
         gameThread = new Thread(this);
 
-        gameThread.start();
-
         srv = new Server();
-        srv.init();
-
         srv.start();
 
+        gameThread.start();
     }
 
     public static void setGameOver() {
@@ -95,12 +95,12 @@ public class ServerGame implements Runnable {
     }
 
     private class Server extends Thread {
-        ServerSocket serverSocket;
-        Socket sock;
-        ObjectInputStream oin;
-        ObjectOutputStream oout;
+        final ServerSocket serverSocket;
+        final Socket sock;
+        final ObjectInputStream oin;
+        final ObjectOutputStream oout;
 
-        private void init() {
+        public Server() {
             try {
                 serverSocket = new ServerSocket(12345);
 
@@ -114,6 +114,7 @@ public class ServerGame implements Runnable {
                 throw new IllegalStateException("Error establishing connection", e);
             }
         }
+
 
         @Override
         public void run() {
@@ -130,7 +131,15 @@ public class ServerGame implements Runnable {
 
         private void sendState() {
             try {
-                oout.writeObject(new RenderObject(serverPlayer, clientPlayer, lvl, Collections.emptyList(), Collections.emptyList()));
+                synchronized (serverPlayer) {
+                    synchronized (clientPlayer) {
+//                        if (serverPlayer.updated() || clientPlayer.updated()) {
+                            oout.reset();
+
+                            oout.writeObject(new RenderObject(serverPlayer, clientPlayer, lvl, Collections.emptyList(), Collections.emptyList()));
+//                        }
+                    }
+                }
             } catch (Exception e) {
                 LOG.error("Error sending state to client", e);
             }
@@ -184,8 +193,8 @@ public class ServerGame implements Runnable {
 
         clientPlayer.render(graphics);
         for (Bullet bullet : getBullets(EntityType.Player))
-
             bullet.render(graphics);
+
         lvl.renderGrass(graphics);
 
         Display.swapBuffers();
@@ -273,10 +282,10 @@ public class ServerGame implements Runnable {
         bullets.get(type).add(bullet);
     }
 
-    public static void registerBulletinList(String playerName, Bullet bullet) {
-        if (playerName == "serverPlayer") {
+    public static void registerBulletinList(PlayerSide side, Bullet bullet) {
+        if (side == SERVER) {
             serverPlayerBullets.add(bullet);
-        } else if (playerName == "clientPlayer") {
+        } else if (side == CLIENT) {
             clientPlayerBullets.add(bullet);
         }
 
@@ -288,12 +297,12 @@ public class ServerGame implements Runnable {
         }
     }
 
-    public static void unregisterBulletList(String playerName, Bullet bullet) {
-        if (playerName == "serverPlayer") {
+    public static void unregisterBulletList(PlayerSide side, Bullet bullet) {
+        if (side == SERVER) {
             if (serverPlayerBullets.size() > 0) {
                 serverPlayerBullets.remove(bullet);
             }
-        } else if (playerName == "clientPlayer") {
+        } else if (side == CLIENT) {
             if (clientPlayerBullets.size() > 0) {
                 clientPlayerBullets.remove(bullet);
             }
@@ -304,10 +313,10 @@ public class ServerGame implements Runnable {
         return bullets.get(type);
     }
 
-    public static List<Bullet> getBullets(String playerName) {
-        if (playerName == "serverPlayer") {
+    public static List<Bullet> getBullets(PlayerSide side) {
+        if (side == SERVER) {
             return serverPlayerBullets;
-        } else if (playerName == "clientPlayer") {
+        } else if (side == CLIENT) {
             return clientPlayerBullets;
         }
         return null;

@@ -43,7 +43,7 @@ public class Bullet implements Serializable {
     }
 
     private float speed;
-    private Map<BulletHeading, Sprite> spriteMap;
+    private transient Map<BulletHeading, Sprite> spriteMap; // todo
     private BulletHeading bulletHeading;
     private float x;
     private float y;
@@ -52,11 +52,11 @@ public class Bullet implements Serializable {
     transient private Level lvl;
     private EntityType type;
     private boolean explosionDone;
-    private List<Sprite> explosionList;
+    private transient List<Sprite> explosionList; // todo
     private int animationCount;
     private String playerName;
 
-    public Bullet(float x, float y, float scale, float speed, String direction, TextureAtlas atlas, Level lvl, EntityType type, String playerName) {
+    public Bullet(float x, float y, float scale, float speed, String direction, TextureAtlas atlas, Level lvl, EntityType type, PlayerSide side) {
         spriteMap = new HashMap<BulletHeading, Sprite>();
         this.lvl = lvl;
         isActive = true;
@@ -107,7 +107,7 @@ public class Bullet implements Serializable {
                 break;
         }
         ServerGame.registerBullet(type, this);
-        ServerGame.registerBulletinList(playerName,this);
+        ServerGame.registerBulletinList(side,this);
     }
 
     public void update() {

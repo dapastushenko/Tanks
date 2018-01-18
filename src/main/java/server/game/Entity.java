@@ -23,20 +23,18 @@ public abstract class Entity implements Serializable {
     protected float height;
     protected float width;
     protected float scale;
-    transient protected TextureAtlas atlas;
-    transient protected static Level lvl;
+    protected static TextureAtlas atlas = Level.atlas;
+    protected transient  static Level lvl;
     public static final int SPRITE_SCALE = 16;
     protected boolean isAlive;
 
-    protected Entity(EntityType type, float x, float y, float scale,TextureAtlas atlas, Level lvl) {
+    protected Entity(EntityType type, float x, float y, float scale, Level lvl) {
         this.type = type;
         this.x = x;
         this.y = y;
-        this.atlas = atlas;
         this.scale = scale;
         Entity.lvl = lvl;
         isAlive = true;
-
     }
 
     public abstract void update(Input input);
@@ -111,5 +109,18 @@ public abstract class Entity implements Serializable {
             }
         }).start();
 
+    }
+
+    @Override
+    public String toString() {
+        return "Entity{" +
+                "type=" + type +
+                ", x=" + x +
+                ", y=" + y +
+                ", height=" + height +
+                ", width=" + width +
+                ", scale=" + scale +
+                ", isAlive=" + isAlive +
+                '}';
     }
 }

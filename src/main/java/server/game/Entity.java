@@ -28,11 +28,12 @@ public abstract class Entity implements Serializable {
     public static final int SPRITE_SCALE = 16;
     protected boolean isAlive;
 
-    protected Entity(EntityType type, float x, float y, TextureAtlas atlas, Level lvl) {
+    protected Entity(EntityType type, float x, float y, float scale,TextureAtlas atlas, Level lvl) {
         this.type = type;
         this.x = x;
         this.y = y;
         this.atlas = atlas;
+        this.scale = scale;
         Entity.lvl = lvl;
         isAlive = true;
 

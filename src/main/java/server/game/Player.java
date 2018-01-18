@@ -26,12 +26,12 @@ public class Player extends Entity implements Serializable {
     private float bulletSpeed;
     private Bullet bullet;
 
-    public static String playerName;
+    public String playerName;
     private List<Bullet> bulletList;
 
 
     public Player(String playerName, float x, float y, float scale, float speed, TextureAtlas atlas, Level lvl) {
-        super(EntityType.Player, x, y, atlas, lvl);
+        super(EntityType.Player, x, y, scale, atlas, lvl);
 
         heading = Heading.NORTH;
         spriteMap = new HashMap<>();
@@ -164,7 +164,7 @@ public class Player extends Entity implements Serializable {
 //        y = newY;
         if (playerName == "serverPlayer") {
             bulletList = ServerGame.getBullets("clientPlayer");
-            if (bulletList != null) {
+            if (bulletList.size()>0) {
                 for (Bullet clientPlayerBullet : bulletList) {
                     if (getRectangle().intersects(clientPlayerBullet.getRectangle()) && clientPlayerBullet.isActive()) {
                         isAlive = false;
@@ -174,15 +174,16 @@ public class Player extends Entity implements Serializable {
             }
         } else if (playerName == "clientPlayer") {
             bulletList = ServerGame.getBullets("serverPlayer");
-            if (bulletList != null) {
+            if (bulletList.size()>0) {
                 for (Bullet serverPlayerBullet : bulletList) {
-                    if (getRectangle().intersects(serverPlayerBullet.getRectangle()) && serverPlayerBullet.isActive()) {
+                    if (getRectangle().intersects(serverPlayerBullet.getRectangle())&& serverPlayerBullet.isActive() ) {
                         isAlive = false;
                         serverPlayerBullet.setInactive();
                     }
                 }
             }
         }
+
 
     }
 
@@ -193,7 +194,7 @@ public class Player extends Entity implements Serializable {
 
     }
 
-    public static String getPlayerName() {
+    public String getPlayerName() {
         return playerName;
     }
 

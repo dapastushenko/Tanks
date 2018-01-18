@@ -68,7 +68,7 @@ public class ServerGame implements Runnable {
         clientPlayerBullets = new LinkedList<Bullet>();
         bullets.put(EntityType.Player, new LinkedList<>());
         lvl = new Level();
-        clientPlayer = new Player("clientPlayer", 20, 20, 2, 3, Level.atlas, lvl);
+        clientPlayer = new Player("clientPlayer", 300, 20, 2, 3, Level.atlas, lvl);
         serverPlayer = new Player("serverPlayer", 300, 300, 2, 3, Level.atlas, lvl);
 
     }
@@ -157,6 +157,7 @@ public class ServerGame implements Runnable {
     private void update() {
         //физика игры
         serverPlayer.update(input);
+        clientPlayer.update(null, false); //добавлено для тестирования
 //        clientPlayer.update(direction, isSpace);
 //        lvl.update();
 
@@ -183,6 +184,7 @@ public class ServerGame implements Runnable {
 
         clientPlayer.render(graphics);
         for (Bullet bullet : getBullets(EntityType.Player))
+
             bullet.render(graphics);
         lvl.renderGrass(graphics);
 

@@ -10,12 +10,14 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Player extends Entity implements Serializable {
 
     public static final int SPRITE_SCALE = 16; //размер изображения 16 пикселей
     public static final int SPRITES_PER_HEADING = 1;
+
 
     private Heading heading;
     transient private Map<Heading, Sprite> spriteMap;
@@ -24,8 +26,11 @@ public class Player extends Entity implements Serializable {
     private float bulletSpeed;
     private Bullet bullet;
 
+    public static String playerName;
+    private List<Bullet> bulletList;
 
-    public Player(float x, float y, float scale, float speed, TextureAtlas atlas, Level lvl) {
+
+    public Player(String playerName, float x, float y, float scale, float speed, TextureAtlas atlas, Level lvl) {
         super(EntityType.Player, x, y, atlas, lvl);
 
         heading = Heading.NORTH;
@@ -33,6 +38,7 @@ public class Player extends Entity implements Serializable {
         this.scale = scale;
         this.speed = speed;
         bulletSpeed = 6;
+        this.playerName = playerName;
         for (Heading h : Heading.values()) {
             SpriteSheet sheet = new SpriteSheet(h.texture(atlas), SPRITES_PER_HEADING, SPRITE_SCALE);
             Sprite sprite = new Sprite(sheet, scale);
@@ -41,6 +47,7 @@ public class Player extends Entity implements Serializable {
     }
 
     public void FillSpriteMap() {
+//при изменении архитектуры обошлизь без этого метода
         spriteMap = new HashMap<>();
 
         for (Heading h : Heading.values()) {
@@ -85,6 +92,11 @@ public class Player extends Entity implements Serializable {
             heading = Heading.WEST;
         }
         if (isSpace) {
+            if (bullet == null || !bullet.isActive()) {
+                bullet = new Bullet(x, y, scale, bulletSpeed, heading.toString().substring(0, 4), atlas, lvl, EntityType.Player, playerName);
+            }
+
+
 //            if (bullet == null || !bullet.isActive()) {
 //                if (ServerGame.getBullets(EntityType.Player).size() == 0) {
 //                    bullet = new Bullet(x, y, scale, bulletSpeed, heading.toString().substring(0, 4), atlas, lvl,
@@ -150,14 +162,50 @@ public class Player extends Entity implements Serializable {
         }
 //        x = newX;
 //        y = newY;
-    }
-
-        @Override
-        public synchronized void render (Graphics2D g){
-            //проверка направления стороны и вытаскивание нужной картинки(Sprite)
-            spriteMap.get(heading).render(g, x, y);//получаем спрайт
-
+        if (playerName == "serverPlayer") {
+            bulletList = ServerGame.getBullets("clientPlayer");
+            if (bulletList != null) {
+                for (Bullet clientPlayerBullet : bulletList) {
+                    if (getRectangle().intersects(clientPlayerBullet.getRectangle()) && clientPlayerBullet.isActive()) {
+                        isAlive = false;
+                        clientPlayerBullet.setInactive();
+                    }
+                }
+            }
+        } else if (playerName == "clientPlayer") {
+            bulletList = ServerGame.getBullets("serverPlayer");
+            if (bulletList != null) {
+                for (Bullet serverPlayerBullet : bulletList) {
+                    if (getRectangle().intersects(serverPlayerBullet.getRectangle()) && serverPlayerBullet.isActive()) {
+                        isAlive = false;
+                        serverPlayerBullet.setInactive();
+                    }
+                }
+            }
         }
 
     }
+
+    @Override
+    public synchronized void render(Graphics2D g) {
+        //проверка направления стороны и вытаскивание нужной картинки(Sprite)
+        spriteMap.get(heading).render(g, x, y);//получаем спрайт
+
+    }
+
+    public static String getPlayerName() {
+        return playerName;
+    }
+
+    @Override
+    public void drawExplosion(Graphics2D g) {
+        super.drawExplosion(g);
+        ServerGame.setGameOver();
+    }
+
+    @Override
+    public boolean isAlive() {
+        return isAlive;
+    }
+}
 

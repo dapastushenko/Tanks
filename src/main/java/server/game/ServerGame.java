@@ -34,8 +34,8 @@ public class ServerGame implements Runnable {
 
     private static Map<EntityType, List<Bullet>> bullets;
 
-    private List<Bullet> bullets1;
-    private List<Bullet> bullets2;
+    private static List<Bullet> serverPlayerBullets = null;
+    private static List<Bullet> clientPlayerBullets = null;
 
     private boolean running; //флаг запущена ли игра
     private Thread gameThread;
@@ -49,7 +49,7 @@ public class ServerGame implements Runnable {
 
 
     public static final String ATLAS_FILE_NAME = "Battle City JPN.png";
-
+    private static boolean gameOver;
     //не нужно пока что
     public static final int BUF_SIZE = 1024;
 //    private ServerSocketChannel serverSockCh;
@@ -64,10 +64,13 @@ public class ServerGame implements Runnable {
         Display.addInputListener(input);
         //сопстно передаем координаты чтобы порезать картинку
         bullets = new HashMap<>();
+        serverPlayerBullets = new LinkedList<Bullet>();
+        clientPlayerBullets = new LinkedList<Bullet>();
         bullets.put(EntityType.Player, new LinkedList<>());
         lvl = new Level();
-        serverPlayer = new Player(300, 300, 2, 3, Level.atlas,lvl);
-        clientPlayer = new Player(300, 20, 2, 3, Level.atlas,lvl);
+        clientPlayer = new Player("clientPlayer", 20, 20, 2, 3, Level.atlas, lvl);
+        serverPlayer = new Player("serverPlayer", 300, 300, 2, 3, Level.atlas, lvl);
+
     }
 
     public synchronized void start() {
@@ -85,6 +88,10 @@ public class ServerGame implements Runnable {
 
         srv.start();
 
+    }
+
+    public static void setGameOver() {
+        gameOver = true;
     }
 
     private class Server extends Thread {
@@ -165,7 +172,15 @@ public class ServerGame implements Runnable {
         //прорисовка сцен
         Display.clear();
         lvl.render(graphics);
-        serverPlayer.render(graphics);
+
+        if (serverPlayer != null) {
+            if (!serverPlayer.isAlive()) {
+                serverPlayer.drawExplosion(graphics);
+            } else
+                serverPlayer.render(graphics);
+        }
+//        serverPlayer.render(graphics);
+
         clientPlayer.render(graphics);
         for (Bullet bullet : getBullets(EntityType.Player))
             bullet.render(graphics);
@@ -256,13 +271,43 @@ public class ServerGame implements Runnable {
         bullets.get(type).add(bullet);
     }
 
+    public static void registerBulletinList(String playerName, Bullet bullet) {
+        if (playerName == "serverPlayer") {
+            serverPlayerBullets.add(bullet);
+        } else if (playerName == "clientPlayer") {
+            clientPlayerBullets.add(bullet);
+        }
+
+    }
+
     public static void unregisterBullet(EntityType type, Bullet bullet) {
         if (bullets.get(type).size() > 0) {
             bullets.get(type).remove(bullet);
         }
     }
 
+    public static void unregisterBulletList(String playerName, Bullet bullet) {
+        if (playerName == "serverPlayer") {
+            if (serverPlayerBullets.size() > 0) {
+                serverPlayerBullets.remove(bullet);
+            }
+        } else if (playerName == "clientPlayer") {
+            if (clientPlayerBullets.size() > 0) {
+                clientPlayerBullets.remove(bullet);
+            }
+        }
+    }
+
     public static List<Bullet> getBullets(EntityType type) {
         return bullets.get(type);
+    }
+
+    public static List<Bullet> getBullets(String playerName) {
+        if (playerName == "serverPlayer") {
+            return serverPlayerBullets;
+        } else if (playerName == "clientPlayer") {
+            return clientPlayerBullets;
+        }
+        return null;
     }
 }

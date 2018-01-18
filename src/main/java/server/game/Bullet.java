@@ -54,9 +54,9 @@ public class Bullet implements Serializable {
     private boolean explosionDone;
     private List<Sprite> explosionList;
     private int animationCount;
+    private String playerName;
 
-    public Bullet(float x, float y, float scale, float speed, String direction, TextureAtlas atlas, Level lvl,
-                  EntityType type) {
+    public Bullet(float x, float y, float scale, float speed, String direction, TextureAtlas atlas, Level lvl, EntityType type, String playerName) {
         spriteMap = new HashMap<BulletHeading, Sprite>();
         this.lvl = lvl;
         isActive = true;
@@ -106,7 +106,8 @@ public class Bullet implements Serializable {
                 this.y = y + Player.SPRITE_SCALE * scale / 2;
                 break;
         }
-//        ServerGame.registerBullet(type, this);
+        ServerGame.registerBullet(type, this);
+        ServerGame.registerBulletinList(playerName,this);
     }
 
     public void update() {
@@ -135,6 +136,8 @@ public class Bullet implements Serializable {
                 break;
         }
 
+
+
 //        if (type == EntityType.Player) {
 //            List<Bullet> enemyBullets = server.game.getBullets(EntityType.Player);
 //            for (Bullet bullet : enemyBullets)
@@ -144,7 +147,7 @@ public class Bullet implements Serializable {
 //                    bullet.disableExplosion();
 //                    explosionDone = true;
 //                }
-
+//
 //        }
 
         if (x < 0 || x >= ServerGame.WIDTH || y < 0 || y > ServerGame.HEIGHT) {
@@ -155,7 +158,7 @@ public class Bullet implements Serializable {
 
     public void render(Graphics2D g) {
         if (!isActive && explosionDone) {
-//            ServerGame.unregisterBullet(type, this);
+            ServerGame.unregisterBullet(type, this);
             return;
         }
         if (!isActive)
@@ -181,7 +184,7 @@ public class Bullet implements Serializable {
             explosionList.get(2).render(g, adjustedX, adjustedY);
         animationCount++;
 
-        if (animationCount > 12)
+        if (animationCount > 2)
             explosionDone = true;
 
     }
@@ -221,7 +224,7 @@ public class Bullet implements Serializable {
 
     private boolean isImpossableTile(Integer... tileNum) {
         for (int i = 0; i < tileNum.length; i++) {
-            if (tileNum[i] == TileType.BRICK.numeric()) {
+            if (tileNum[i] == TileType.BRICK.numeric()||tileNum[i]==TileType.METAL.numeric()) {
                 return true;
             }
         }

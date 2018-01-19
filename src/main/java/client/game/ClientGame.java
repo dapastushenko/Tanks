@@ -9,9 +9,11 @@ import server.game.*;
 import server.game.level.Level;
 import server.graphics.TextureAtlas;
 import server.utils.Time;
+import server.utils.Utils;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -47,21 +49,36 @@ public class ClientGame implements Runnable {
     private volatile Player serverPlayer;
     private volatile Player clientPlayer;
     private volatile Level lvl;
-
+    private BufferedImage gameOverImage;
     private volatile Client client;
+    private static TextureAtlas atlas;
 
     public static final String ATLAS_FILE_NAME = "Battle City JPN.png";
+    private static boolean gameOver;
 
     public ClientGame() {
         running = false;
         Display.created(WIDTH, HEIGHT, TITLE, CLEAR_COLOR, NUM_BUFFERS);
         graphics = Display.getGraphics();
         input = new Input();
+        atlas = new TextureAtlas(ATLAS_FILE_NAME);
         Display.addInputListener(input);
+        gameOver = false;
         //сопстно передаем координаты чтобы порезать картинку
 //        serverPlayer = new server.game.Player(300, 300, 2, 3, atlas, lvl);
 //        clientPlayer = new server.game.Player(300, 20, 2, 3, atlas, lvl);
         lvl = new Level();
+        gameOverImage = Utils.resize(
+                atlas.cut(36 * Level.TILE_SCALE, 23 * Level.TILE_SCALE, 4 * Level.TILE_SCALE, 2 * Level.TILE_SCALE),
+                4 * Level.SCALED_TILES_SIZE, 2 * Level.SCALED_TILES_SIZE);
+        for (int i = 0; i < gameOverImage.getHeight(); i++)
+            for (int j = 0; j < gameOverImage.getWidth(); j++) {
+                int pixel = gameOverImage.getRGB(j, i);
+                if ((pixel & 0x00FFFFFF) < 10)
+                    gameOverImage.setRGB(j, i, (pixel & 0x00FFFFFF));
+            }
+
+
     }
 
     public synchronized void start() {
@@ -78,6 +95,10 @@ public class ClientGame implements Runnable {
 
         gameThread.start();
         client.start();
+    }
+
+    public static void setGameOver() {
+        gameOver = true;
     }
 
     protected class Client extends Thread {
@@ -191,6 +212,24 @@ public class ClientGame implements Runnable {
 //        for (Bullet bullet : getBullets(EntityType.Player))
 //            bullet.render(graphics);
         lvl.renderGrass(graphics);
+        if (serverPlayer != null) {
+            if (!serverPlayer.isAlive()) {
+                serverPlayer.drawExplosion(graphics);
+
+            } else
+                serverPlayer.render(graphics);
+        }
+        if (clientPlayer != null) {
+            if (!clientPlayer.isAlive()) {
+                clientPlayer.drawExplosion(graphics);
+            } else
+                clientPlayer.render(graphics);
+        }
+
+        if (gameOver) {
+            graphics.drawImage(gameOverImage, ServerGame.WIDTH / 2 - 2 * Level.SCALED_TILES_SIZE, ServerGame.HEIGHT / 2, null);
+
+        }
 
         Display.swapBuffers();
 

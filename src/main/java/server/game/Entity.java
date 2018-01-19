@@ -1,5 +1,6 @@
 package server.game;
 
+import com.sun.org.apache.xpath.internal.functions.FuncFalse;
 import server.IO.Input;
 import server.game.level.Level;
 import server.game.level.TileType;
@@ -64,10 +65,9 @@ public abstract class Entity implements Serializable {
         Integer[][] tileMap = lvl.getTileMap();
 
         if (Integer.max(tileY, tileBottomY) >= tileMap.length || Integer.max(tileX, tileBottomX) >= tileMap[0].length
-                || isImpossableTile(tileMap[tileY][tileX], tileMap[tileCenterY][tileCenterX],
-                tileMap[tileBottomY][tileBottomX])) {
+                || isImpossableTile(tileMap[tileY][tileX], tileMap[tileCenterY][tileCenterX], tileMap[tileBottomY][tileBottomX])) {
 
-            return true;
+            return false;
         } else
             return true;
 
@@ -79,7 +79,7 @@ public abstract class Entity implements Serializable {
                     || tileNum[i] == TileType.WATER.numeric()) {
                 return true;
             }
-        return true;
+        return false;
     }
 
     public void drawExplosion(Graphics2D g) {

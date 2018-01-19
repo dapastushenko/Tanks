@@ -8,8 +8,10 @@ import server.display.Display;
 import server.game.level.Level;
 import server.graphics.TextureAtlas;
 import server.utils.Time;
+import server.utils.Utils;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -47,9 +49,9 @@ public class ServerGame implements Runnable {
     private final Player serverPlayer;
     private final Player clientPlayer;
     private final Level lvl;
-
+    private BufferedImage gameOverImage;
+    private static TextureAtlas atlas;
     private volatile Server srv;
-
 
     public static final String ATLAS_FILE_NAME = "Battle City JPN.png";
     private static boolean gameOver;
@@ -64,16 +66,26 @@ public class ServerGame implements Runnable {
         Display.created(WIDTH, HEIGHT, TITLE, CLEAR_COLOR, NUM_BUFFERS);
         graphics = Display.getGraphics();
         input = new Input();
+        atlas = new TextureAtlas(ATLAS_FILE_NAME);
         Display.addInputListener(input);
-        //сопстно передаем координаты чтобы порезать картинку
         bullets = new HashMap<>();
         serverPlayerBullets = new LinkedList<Bullet>();
         clientPlayerBullets = new LinkedList<Bullet>();
         bullets.put(EntityType.Player, new LinkedList<>());
         lvl = new Level();
+        gameOver = false;
         clientPlayer = new Player(CLIENT, 300, 20, 2, 3, lvl);
         serverPlayer = new Player(SERVER, 300, 300, 2, 3, lvl);
 
+        gameOverImage = Utils.resize(
+                atlas.cut(36 * Level.TILE_SCALE, 23 * Level.TILE_SCALE, 4 * Level.TILE_SCALE, 2 * Level.TILE_SCALE),
+                4 * Level.SCALED_TILES_SIZE, 2 * Level.SCALED_TILES_SIZE);
+        for (int i = 0; i < gameOverImage.getHeight(); i++)
+            for (int j = 0; j < gameOverImage.getWidth(); j++) {
+                int pixel = gameOverImage.getRGB(j, i);
+                if ((pixel & 0x00FFFFFF) < 10)
+                    gameOverImage.setRGB(j, i, (pixel & 0x00FFFFFF));
+            }
     }
 
     public synchronized void start() {
@@ -134,9 +146,9 @@ public class ServerGame implements Runnable {
                 synchronized (serverPlayer) {
                     synchronized (clientPlayer) {
 //                        if (serverPlayer.updated() || clientPlayer.updated()) {
-                            oout.reset();
+                        oout.reset();
 
-                            oout.writeObject(new RenderObject(serverPlayer, clientPlayer, lvl, Collections.emptyList(), Collections.emptyList()));
+                        oout.writeObject(new RenderObject(serverPlayer, clientPlayer, lvl, Collections.emptyList(), Collections.emptyList()));
 //                        }
                     }
                 }
@@ -165,6 +177,7 @@ public class ServerGame implements Runnable {
 
     private void update() {
         //физика игры
+
         serverPlayer.update(input);
         clientPlayer.update(null, false); //добавлено для тестирования
 //        clientPlayer.update(direction, isSpace);
@@ -185,9 +198,16 @@ public class ServerGame implements Runnable {
 
         if (serverPlayer != null) {
             if (!serverPlayer.isAlive()) {
-                serverPlayer.drawExplosion(graphics);
+               serverPlayer.drawExplosion(graphics);
+
             } else
                 serverPlayer.render(graphics);
+        }
+        if (clientPlayer != null) {
+            if (!clientPlayer.isAlive()) {
+                clientPlayer.drawExplosion(graphics);
+            } else
+                clientPlayer.render(graphics);
         }
 //        serverPlayer.render(graphics);
 
@@ -196,7 +216,10 @@ public class ServerGame implements Runnable {
             bullet.render(graphics);
 
         lvl.renderGrass(graphics);
+        if (gameOver) {
+            graphics.drawImage(gameOverImage, ServerGame.WIDTH / 2 - 2 * Level.SCALED_TILES_SIZE, ServerGame.HEIGHT / 2, null);
 
+        }
         Display.swapBuffers();
     }
 
@@ -209,8 +232,6 @@ public class ServerGame implements Runnable {
         int updl = 0;
 
         long count = 0;
-
-
         float delta = 0;
 
         long lasttime = Time.get(); //прошлое время

@@ -1,5 +1,6 @@
 package server.game;
 
+import client.game.ClientGame;
 import server.IO.Input;
 import server.game.level.Level;
 import server.graphics.Sprite;
@@ -88,17 +89,22 @@ public class Player extends Entity implements Serializable {
 
         if (direction == Heading.NORTH) {
             newY -= speed;
+            x = newX = (Math.round(newX / Level.SCALED_TILES_SIZE)) * Level.SCALED_TILES_SIZE;
             heading = Heading.NORTH;
         } else if (direction == Heading.EAST) {
             newX += speed;
+            y = newY = (Math.round(newY / Level.SCALED_TILES_SIZE)) * Level.SCALED_TILES_SIZE;
             heading = Heading.EAST;
         } else if (direction == Heading.SOUTH) {
             newY += speed;
+            x = newX = (Math.round(newX / Level.SCALED_TILES_SIZE)) * Level.SCALED_TILES_SIZE;
             heading = Heading.SOUTH;
         } else if (direction == Heading.WEST) {
             newX -= speed;
+            y = newY = (Math.round(newY / Level.SCALED_TILES_SIZE)) * Level.SCALED_TILES_SIZE;
             heading = Heading.WEST;
         }
+
         if (isSpace) {
             if (bullet == null || !bullet.isActive()) {
                 bullet = new Bullet(x, y, scale, bulletSpeed, heading.toString().substring(0, 4), atlas, lvl, EntityType.Player, side);
@@ -113,19 +119,6 @@ public class Player extends Entity implements Serializable {
 //            }
         }
 
-        /*
-эта штука не работает
-//      System.out.println(newX + " " + newY);
-//        input.getKey(KeyEvent.VK_SPACE);
-        for (Point p : Level.tilesCords) {
-//            System.out.println(p.x+" "+p.y);
-            if (newX <= p.x && newY == p.y) {
-                System.out.println("1111");
-                newX = p.x - SPRITE_SCALE * scale;
-                newY = p.y - SPRITE_SCALE * scale;
-            }
-        }
-*/
         if (newX < 0) {
             newX = 0;
         } else if (newX >= ServerGame.WIDTH - SPRITE_SCALE * scale) { //проверяем чтобы не уехать за экран
@@ -145,7 +138,7 @@ public class Player extends Entity implements Serializable {
                 }
                 break;
             case SOUTH:
-                if (canMove(newX, newY + (SPRITE_SCALE * scale), newX + (SPRITE_SCALE * scale / 2),
+                if (canMove(newX, newY + (SPRITE_SCALE * scale), newX + (SPRITE_SCALE * scale/2),
                         newY + (SPRITE_SCALE * scale), newX + (SPRITE_SCALE * scale), newY + (SPRITE_SCALE * scale))
                         ) {
                     x = newX;
@@ -153,7 +146,7 @@ public class Player extends Entity implements Serializable {
                 }
                 break;
             case EAST:
-                if (canMove(newX + (SPRITE_SCALE * scale), newY, newX + (SPRITE_SCALE * scale),
+                if (canMove(newX + (SPRITE_SCALE * scale), newY, newX + (SPRITE_SCALE * scale/2),
                         newY + (SPRITE_SCALE * scale / 2), newX + (SPRITE_SCALE * scale), newY + (SPRITE_SCALE * scale))
                         ) {
                     x = newX;
@@ -161,7 +154,7 @@ public class Player extends Entity implements Serializable {
                 }
                 break;
             case WEST:
-                if (canMove(newX, newY, newX, newY + (SPRITE_SCALE * scale / 2), newX, newY + (SPRITE_SCALE * scale))
+                if (canMove(newX, newY, newX, newY + (SPRITE_SCALE * scale), newX, newY + (SPRITE_SCALE * scale))
                         ) {
                     x = newX;
                     y = newY;
@@ -172,7 +165,7 @@ public class Player extends Entity implements Serializable {
 //        y = newY;
         if (side == SERVER) {
             bulletList = ServerGame.getBullets(CLIENT);
-            if (bulletList.size()>0) {
+            if (bulletList.size() > 0) {
                 for (Bullet clientPlayerBullet : bulletList) {
                     if (getRectangle().intersects(clientPlayerBullet.getRectangle()) && clientPlayerBullet.isActive()) {
                         isAlive = false;
@@ -182,11 +175,12 @@ public class Player extends Entity implements Serializable {
             }
         } else if (side == CLIENT) {
             bulletList = ServerGame.getBullets(SERVER);
-            if (bulletList.size()>0) {
+            if (bulletList.size() > 0) {
                 for (Bullet serverPlayerBullet : bulletList) {
-                    if (getRectangle().intersects(serverPlayerBullet.getRectangle())&& serverPlayerBullet.isActive() ) {
+                    if (getRectangle().intersects(serverPlayerBullet.getRectangle()) && serverPlayerBullet.isActive()) {
                         isAlive = false;
                         serverPlayerBullet.setInactive();
+                        System.out.printf("111");
                     }
                 }
             }
@@ -221,6 +215,7 @@ public class Player extends Entity implements Serializable {
     public void drawExplosion(Graphics2D g) {
         super.drawExplosion(g);
         ServerGame.setGameOver();
+        ClientGame.setGameOver();
     }
 
     @Override

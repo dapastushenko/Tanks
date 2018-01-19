@@ -57,7 +57,7 @@ public class Bullet implements Serializable {
     private String playerName;
 
     public Bullet(float x, float y, float scale, float speed, String direction, TextureAtlas atlas, Level lvl, EntityType type, PlayerSide side) {
-        spriteMap = new HashMap<BulletHeading, Sprite>();
+//        spriteMap = new HashMap<BulletHeading, Sprite>();
         this.lvl = lvl;
         isActive = true;
         this.type = type;
@@ -66,23 +66,25 @@ public class Bullet implements Serializable {
         this.speed = speed;
 
         explosionDone = false;
-        //допилить кусок
-        explosionList = new ArrayList<>();
-        explosionList.add(new Sprite(new SpriteSheet(atlas.cut(16 * Player.SPRITE_SCALE, 8 * Player.SPRITE_SCALE,
-                Player.SPRITE_SCALE, Player.SPRITE_SCALE), Player.SPRITE_SCALE, Player.SPRITE_SCALE),
-                scale));
-        explosionList.add(new Sprite(new SpriteSheet(atlas.cut(17 * Player.SPRITE_SCALE, 8 * Player.SPRITE_SCALE,
-                Player.SPRITE_SCALE, Player.SPRITE_SCALE), Player.SPRITE_SCALE, Player.SPRITE_SCALE),
-                scale));
-        explosionList.add(new Sprite(new SpriteSheet(atlas.cut(18 * Player.SPRITE_SCALE, 8 * Player.SPRITE_SCALE,
-                Player.SPRITE_SCALE, Player.SPRITE_SCALE), Player.SPRITE_SCALE, Player.SPRITE_SCALE),
-                scale));
+        fillSpriteMap();
 
-        for (BulletHeading bh : BulletHeading.values()) {
-            SpriteSheet sheet = new SpriteSheet(bh.texture(atlas), Player.SPRITES_PER_HEADING, Player.SPRITE_SCALE / 2);
-            Sprite sprite = new Sprite(sheet, scale);
-            spriteMap.put(bh, sprite);
-        }
+        //допилить кусок
+//        explosionList = new ArrayList<>();
+//        explosionList.add(new Sprite(new SpriteSheet(atlas.cut(16 * Player.SPRITE_SCALE, 8 * Player.SPRITE_SCALE,
+//                Player.SPRITE_SCALE, Player.SPRITE_SCALE), Player.SPRITE_SCALE, Player.SPRITE_SCALE),
+//                scale));
+//        explosionList.add(new Sprite(new SpriteSheet(atlas.cut(17 * Player.SPRITE_SCALE, 8 * Player.SPRITE_SCALE,
+//                Player.SPRITE_SCALE, Player.SPRITE_SCALE), Player.SPRITE_SCALE, Player.SPRITE_SCALE),
+//                scale));
+//        explosionList.add(new Sprite(new SpriteSheet(atlas.cut(18 * Player.SPRITE_SCALE, 8 * Player.SPRITE_SCALE,
+//                Player.SPRITE_SCALE, Player.SPRITE_SCALE), Player.SPRITE_SCALE, Player.SPRITE_SCALE),
+//                scale));
+//
+//        for (BulletHeading bh : BulletHeading.values()) {
+//            SpriteSheet sheet = new SpriteSheet(bh.texture(atlas), Player.SPRITES_PER_HEADING, Player.SPRITE_SCALE / 2);
+//            Sprite sprite = new Sprite(sheet, scale);
+//            spriteMap.put(bh, sprite);
+//        }
 
         switch (direction) {
             case "EAST":
@@ -107,10 +109,35 @@ public class Bullet implements Serializable {
                 break;
         }
         ServerGame.registerBullet(type, this);
-        ServerGame.registerBulletinList(side,this);
+        ServerGame.registerBulletinList(side, this);
+    }
+
+    public void fillSpriteMap() {
+        spriteMap = new HashMap<BulletHeading, Sprite>();
+        TextureAtlas atlas = Level.atlas;
+
+        explosionList = new ArrayList<>();
+        explosionList.add(new Sprite(new SpriteSheet(atlas.cut(16 * Player.SPRITE_SCALE, 8 * Player.SPRITE_SCALE,
+                Player.SPRITE_SCALE, Player.SPRITE_SCALE), Player.SPRITE_SCALE, Player.SPRITE_SCALE),
+                scale));
+        explosionList.add(new Sprite(new SpriteSheet(atlas.cut(17 * Player.SPRITE_SCALE, 8 * Player.SPRITE_SCALE,
+                Player.SPRITE_SCALE, Player.SPRITE_SCALE), Player.SPRITE_SCALE, Player.SPRITE_SCALE),
+                scale));
+        explosionList.add(new Sprite(new SpriteSheet(atlas.cut(18 * Player.SPRITE_SCALE, 8 * Player.SPRITE_SCALE,
+                Player.SPRITE_SCALE, Player.SPRITE_SCALE), Player.SPRITE_SCALE, Player.SPRITE_SCALE),
+                scale));
+
+        for (BulletHeading bh : BulletHeading.values()) {
+            SpriteSheet sheet = new SpriteSheet(bh.texture(atlas), Player.SPRITES_PER_HEADING, Player.SPRITE_SCALE / 2);
+            Sprite sprite = new Sprite(sheet, scale);
+            spriteMap.put(bh, sprite);
+        }
     }
 
     public void update() {
+
+            fillSpriteMap();
+
         switch (bulletHeading) {
             case B_EAST:
                 x += speed;
@@ -137,7 +164,6 @@ public class Bullet implements Serializable {
         }
 
 
-
 //        if (type == EntityType.Player) {
 //            List<Bullet> enemyBullets = server.game.getBullets(EntityType.Player);
 //            for (Bullet bullet : enemyBullets)
@@ -156,23 +182,26 @@ public class Bullet implements Serializable {
 
     }
 
-    public void render(Graphics2D g) {
+    public void render(Graphics2D g, PlayerSide side) {
         if (!isActive && explosionDone) {
-            ServerGame.unregisterBullet(type, this);
+
+            ServerGame.unregisterBullet(type, this, side);
             return;
         }
         if (!isActive)
             drawExplosion(g);
-
+if (spriteMap==null)
+    fillSpriteMap();
         if (isActive) {
             spriteMap.get(bulletHeading).render(g, x, y);
+
         }
     }
 
     public void drawExplosion(Graphics2D g) {
         if (explosionDone)
             return;
-
+fillSpriteMap();
         float adjustedX = x - Player.SPRITE_SCALE * scale / 4;
         float adjustedY = y - Player.SPRITE_SCALE * scale / 4;
 
@@ -224,7 +253,7 @@ public class Bullet implements Serializable {
 
     private boolean isImpossableTile(Integer... tileNum) {
         for (int i = 0; i < tileNum.length; i++) {
-            if (tileNum[i] == TileType.BRICK.numeric()||tileNum[i]==TileType.METAL.numeric()) {
+            if (tileNum[i] == TileType.BRICK.numeric() || tileNum[i] == TileType.METAL.numeric()) {
                 return true;
             }
         }

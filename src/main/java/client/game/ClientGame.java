@@ -10,6 +10,7 @@ import server.game.level.Level;
 import server.graphics.TextureAtlas;
 import server.utils.Time;
 import server.utils.Utils;
+import server.game.Bullet;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -24,6 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static server.game.ServerGame.getBullets;
 
 public class ClientGame implements Runnable {
     public static final int WIDTH = 800;
@@ -60,13 +63,12 @@ public class ClientGame implements Runnable {
         running = false;
         Display.created(WIDTH, HEIGHT, TITLE, CLEAR_COLOR, NUM_BUFFERS);
         graphics = Display.getGraphics();
+        serverPlayerBullets = new LinkedList<Bullet>();
+        clientPlayerBullets = new LinkedList<Bullet>();
         input = new Input();
         atlas = new TextureAtlas(ATLAS_FILE_NAME);
         Display.addInputListener(input);
         gameOver = false;
-        //сопстно передаем координаты чтобы порезать картинку
-//        serverPlayer = new server.game.Player(300, 300, 2, 3, atlas, lvl);
-//        clientPlayer = new server.game.Player(300, 20, 2, 3, atlas, lvl);
         lvl = new Level();
         gameOverImage = Utils.resize(
                 atlas.cut(36 * Level.TILE_SCALE, 23 * Level.TILE_SCALE, 4 * Level.TILE_SCALE, 2 * Level.TILE_SCALE),
@@ -180,14 +182,11 @@ public class ClientGame implements Runnable {
 
         if (input.getKey(KeyEvent.VK_UP)) {
             cmd = new Command(Heading.NORTH, isSpace);
-        }
-        else if (input.getKey(KeyEvent.VK_RIGHT)) {
+        } else if (input.getKey(KeyEvent.VK_RIGHT)) {
             cmd = new Command(Heading.EAST, isSpace);
-        }
-        else if (input.getKey(KeyEvent.VK_DOWN)) {
+        } else if (input.getKey(KeyEvent.VK_DOWN)) {
             cmd = new Command(Heading.SOUTH, isSpace);
-        }
-        else if (input.getKey(KeyEvent.VK_LEFT)) {
+        } else if (input.getKey(KeyEvent.VK_LEFT)) {
             cmd = new Command(Heading.WEST, isSpace);
         }
 
@@ -200,7 +199,7 @@ public class ClientGame implements Runnable {
             client.sendUpdate(cmd);
         }
 
-        // send to all clients: write to ObjectOutputStream
+
     }
 
     private void render() {
@@ -209,8 +208,10 @@ public class ClientGame implements Runnable {
         lvl.render(graphics);
         serverPlayer.render(graphics);
         clientPlayer.render(graphics);
-//        for (Bullet bullet : getBullets(EntityType.Player))
-//            bullet.render(graphics);
+        for (Bullet serverBullet : serverPlayerBullets)
+            serverBullet.render(graphics, PlayerSide.CLIENT);
+        for (Bullet clientBullet:clientPlayerBullets )
+            clientBullet.render(graphics,PlayerSide.CLIENT);
         lvl.renderGrass(graphics);
         if (serverPlayer != null) {
             if (!serverPlayer.isAlive()) {
@@ -233,7 +234,7 @@ public class ClientGame implements Runnable {
 
         Display.swapBuffers();
 
-        //todo bullets render
+
     }
 
     @Override
@@ -280,15 +281,15 @@ public class ClientGame implements Runnable {
                 assert client != null;
 
 
-                    serverPlayer = rnd.serverPlayer;
-                    clientPlayer = rnd.clientPlayer;
-                    lvl = rnd.level;
-                    serverPlayerBullets = rnd.serverPlayerBullets;
-                    clientPlayerBullets = rnd.clientPlayerBullets;
+                serverPlayer = rnd.serverPlayer;
+                clientPlayer = rnd.clientPlayer;
+                lvl = rnd.level;
+                serverPlayerBullets = rnd.serverPlayerBullets;
+                clientPlayerBullets = rnd.clientPlayerBullets;
 
                 //если что-то изменили перерисовываем сцену
 
-                    render();
+                render();
                 fps++;
             } else {
                 //стопим тред

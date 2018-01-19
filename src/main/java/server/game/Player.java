@@ -9,6 +9,7 @@ import server.graphics.SpriteSheet;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,6 +78,8 @@ public class Player extends Entity implements Serializable {
             update(Heading.WEST, isSpace);
         } else if (isSpace)
             update(null, true);
+        else
+            update(null, false);
 
     }
 
@@ -186,6 +189,20 @@ public class Player extends Entity implements Serializable {
             }
         }
 
+//        List<Bullet> bullets = new ArrayList<>();
+//
+//        bullets.addAll(ServerGame.getBullets(CLIENT));
+//        bullets.addAll(ServerGame.getBullets(SERVER));
+//
+//        if (bullets.size() > 0) {
+//            for (Bullet clientPlayerBullet : bullets) {
+//                if (getRectangle().intersects(clientPlayerBullet.getRectangle()) && clientPlayerBullet.isActive()) {
+//                    isAlive = false;
+//                    clientPlayerBullet.setInactive();
+//                    break;
+//                }
+//            }
+//        }
 
 //        updated = true;
     }

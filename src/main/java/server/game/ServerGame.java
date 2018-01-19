@@ -39,8 +39,8 @@ public class ServerGame implements Runnable {
 
     private static Map<EntityType, List<Bullet>> bullets;
 
-    private static List<Bullet> serverPlayerBullets = null;
-    private static List<Bullet> clientPlayerBullets = null;
+    private static List<Bullet> serverPlayerBullets = Collections.emptyList();
+    private static List<Bullet> clientPlayerBullets = Collections.emptyList();
 
     private boolean running; //флаг запущена ли игра
     private Thread gameThread;
@@ -147,8 +147,9 @@ public class ServerGame implements Runnable {
                     synchronized (clientPlayer) {
 //                        if (serverPlayer.updated() || clientPlayer.updated()) {
                         oout.reset();
-
-                        oout.writeObject(new RenderObject(serverPlayer, clientPlayer, lvl, Collections.emptyList(), Collections.emptyList()));
+if (serverPlayerBullets.size()==0)
+    System.out.printf("i have server bullets");
+                        oout.writeObject(new RenderObject(serverPlayer, clientPlayer, lvl, serverPlayerBullets, clientPlayerBullets));
 //                        }
                     }
                 }
@@ -179,7 +180,7 @@ public class ServerGame implements Runnable {
         //физика игры
 
         serverPlayer.update(input);
-        clientPlayer.update(null, false); //добавлено для тестирования
+        clientPlayer.update(null, false);
 //        clientPlayer.update(direction, isSpace);
 //        lvl.update();
 
@@ -213,7 +214,7 @@ public class ServerGame implements Runnable {
 
         clientPlayer.render(graphics);
         for (Bullet bullet : getBullets(EntityType.Player))
-            bullet.render(graphics);
+            bullet.render(graphics,PlayerSide.SERVER);
 
         lvl.renderGrass(graphics);
         if (gameOver) {
@@ -256,22 +257,6 @@ public class ServerGame implements Runnable {
                 }
             }
             if (render) {
-
-//                if (srv.oout != null) {
-////пример                    srv.oout.writeObject(); // lvl, players
-//                    try {
-//                        System.out.println("111");
-//                        srv.oout.writeObject(serverPlayer);
-//                        srv.oout.writeObject(clientPlayer);
-////пока без уровня       srv.oout.writeObject(lvl);
-//
-//                        srv.oout.flush();
-//
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                }
                 //если что-то изменили перерисовываем сцену
                 render();
                 fps++;
@@ -312,9 +297,18 @@ public class ServerGame implements Runnable {
 
     }
 
-    public static void unregisterBullet(EntityType type, Bullet bullet) {
-        if (bullets.get(type).size() > 0) {
-            bullets.get(type).remove(bullet);
+    public static void unregisterBullet(EntityType type, Bullet bullet, PlayerSide side) {
+        if(side==SERVER) {
+            if (serverPlayerBullets.size() > 0) {
+                serverPlayerBullets.remove(bullet);
+            }
+            if (bullets.get(type).size() > 0) {
+                bullets.get(type).remove(bullet);
+            }
+        } else if (side == CLIENT) {
+            if (clientPlayerBullets.size() > 0) {
+                clientPlayerBullets.remove(bullet);
+            }
         }
     }
 
@@ -340,6 +334,6 @@ public class ServerGame implements Runnable {
         } else if (side == CLIENT) {
             return clientPlayerBullets;
         }
-        return null;
+        return Collections.emptyList();
     }
 }

@@ -148,7 +148,7 @@ public class ServerGame implements Runnable {
 //                        if (serverPlayer.updated() || clientPlayer.updated()) {
                         oout.reset();
 if (serverPlayerBullets.size()==0)
-    System.out.printf("i have server bullets");
+
                         oout.writeObject(new RenderObject(serverPlayer, clientPlayer, lvl, serverPlayerBullets, clientPlayerBullets));
 //                        }
                     }

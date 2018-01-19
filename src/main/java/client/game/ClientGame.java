@@ -10,7 +10,6 @@ import server.game.level.Level;
 import server.graphics.TextureAtlas;
 import server.utils.Time;
 import server.utils.Utils;
-import server.game.Bullet;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -20,13 +19,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static server.game.ServerGame.getBullets;
 
 public class ClientGame implements Runnable {
     public static final int WIDTH = 800;
@@ -208,10 +203,12 @@ public class ClientGame implements Runnable {
         lvl.render(graphics);
         serverPlayer.render(graphics);
         clientPlayer.render(graphics);
+
         for (Bullet serverBullet : serverPlayerBullets)
-            serverBullet.render(graphics, PlayerSide.CLIENT);
-        for (Bullet clientBullet:clientPlayerBullets )
-            clientBullet.render(graphics,PlayerSide.CLIENT);
+            serverBullet.render(graphics, PlayerSide.SERVER);
+        for (Bullet clientBullet : clientPlayerBullets)
+            clientBullet.render(graphics, PlayerSide.CLIENT);
+
         lvl.renderGrass(graphics);
         if (serverPlayer != null) {
             if (!serverPlayer.isAlive()) {

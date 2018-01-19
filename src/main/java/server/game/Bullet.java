@@ -136,7 +136,7 @@ public class Bullet implements Serializable {
 
     public void update() {
 
-            fillSpriteMap();
+        fillSpriteMap();
 
         switch (bulletHeading) {
             case B_EAST:
@@ -190,8 +190,7 @@ public class Bullet implements Serializable {
         }
         if (!isActive)
             drawExplosion(g);
-if (spriteMap==null)
-    fillSpriteMap();
+            fillSpriteMap();
         if (isActive) {
             spriteMap.get(bulletHeading).render(g, x, y);
 
@@ -201,7 +200,7 @@ if (spriteMap==null)
     public void drawExplosion(Graphics2D g) {
         if (explosionDone)
             return;
-fillSpriteMap();
+        fillSpriteMap();
         float adjustedX = x - Player.SPRITE_SCALE * scale / 4;
         float adjustedY = y - Player.SPRITE_SCALE * scale / 4;
 

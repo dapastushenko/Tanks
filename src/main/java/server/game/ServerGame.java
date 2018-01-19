@@ -147,7 +147,6 @@ public class ServerGame implements Runnable {
                     synchronized (clientPlayer) {
 //                        if (serverPlayer.updated() || clientPlayer.updated()) {
                         oout.reset();
-if (serverPlayerBullets.size()==0)
 
                         oout.writeObject(new RenderObject(serverPlayer, clientPlayer, lvl, serverPlayerBullets, clientPlayerBullets));
 //                        }
@@ -199,7 +198,7 @@ if (serverPlayerBullets.size()==0)
 
         if (serverPlayer != null) {
             if (!serverPlayer.isAlive()) {
-               serverPlayer.drawExplosion(graphics);
+                serverPlayer.drawExplosion(graphics);
 
             } else
                 serverPlayer.render(graphics);
@@ -214,7 +213,7 @@ if (serverPlayerBullets.size()==0)
 
         clientPlayer.render(graphics);
         for (Bullet bullet : getBullets(EntityType.Player))
-            bullet.render(graphics,PlayerSide.SERVER);
+            bullet.render(graphics, PlayerSide.SERVER);
 
         lvl.renderGrass(graphics);
         if (gameOver) {
@@ -298,12 +297,12 @@ if (serverPlayerBullets.size()==0)
     }
 
     public static void unregisterBullet(EntityType type, Bullet bullet, PlayerSide side) {
-        if(side==SERVER) {
+        if (side == SERVER) {
             if (serverPlayerBullets.size() > 0) {
                 serverPlayerBullets.remove(bullet);
-            }
-            if (bullets.get(type).size() > 0) {
-                bullets.get(type).remove(bullet);
+//            }
+//            if (bullets.get(type).size() > 0) {
+//                bullets.get(type).remove(bullet);
             }
         } else if (side == CLIENT) {
             if (clientPlayerBullets.size() > 0) {
